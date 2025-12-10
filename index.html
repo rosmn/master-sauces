@@ -93,20 +93,20 @@
     font-weight: 500;
   }
 
-  .mood-Spicy { background: #ff4c4c; }
-  .mood-Fresh { background: #1ed760; }
-  .mood-Citrusy { background: #ffb84c; }
-  .mood-Umami { background: #4c9cff; }
-  .mood-Creamy { background: #d84cff; }
-  .mood-Smoky { background: #777; }
+  .mood__color-Spicy { background: #ff4c4c; }
+  .mood__color-Fresh { background: #1ed760; }
+  .mood__color-Citrusy { background: #ffb84c; }
+  .mood__color-Umami { background: #4c9cff; }
+  .mood__color-Creamy { background: #d84cff; }
+  .mood__color-Smoky { background: #777; }
 
-  .flavor-Asian { background: #ff6e40; }
-  .flavor-Latin { background: #ffcc29; color:#000; }
-  .flavor-Mediterranean { background: #2ed3c2; color:#000; }
-  .flavor-African { background: #ff7f50; }
-  .flavor-USA { background: #ff5e78; }
-  .flavor-MiddleEast { background: #9b59b6; }
-  .flavor-EasternEurope { background: #95a5a6; }
+  .flavor__color-Asian { background: #ff6e40; }
+  .flavor__color-Latin { background: #ffcc29; color:#000; }
+  .flavor__color-Mediterranean { background: #2ed3c2; color:#000; }
+  .flavor__color-African { background: #ff7f50; }
+  .flavor__color-USA { background: #ff5e78; }
+  .flavor__color-MiddleEast { background: #9b59b6; }
+  .flavor__color-EasternEurope { background: #95a5a6; }
 
   @media (max-width: 500px) {
     .filters {
@@ -174,14 +174,16 @@ function renderCards() {
   sauces.forEach(sauce => {
     const card = document.createElement('div');
     card.classList.add('card');
+    card.classList.add('mood-' + sauce.mood.split(' ')[0]);
+    card.classList.add('flavor-' + sauce.flavor.replace(/\s/g,''));
     card.innerHTML = `
       <h3>${sauce.name}</h3>
       <p><strong>Main:</strong> ${sauce.main}</p>
       <p><strong>Optional:</strong> ${sauce.optional}</p>
       <p><strong>Best Veggies:</strong> ${sauce.veggies}</p>
       <div>
-        <span class="badge mood-${sauce.mood.split(' ')[0]}">${sauce.mood}</span>
-        <span class="badge flavor-${sauce.flavor.replace(/\s/g,'')}">${sauce.flavor}</span>
+        <span class="badge mood-${sauce.mood.split(' ')[0]} mood__color-${sauce.mood.split(' ')[0]}">${sauce.mood}</span>
+        <span class="badge flavor-${sauce.flavor.replace(/\s/g,'')} flavor__color-${sauce.flavor.replace(/\s/g,'')}">${sauce.flavor}</span>
       </div>
     `;
     container.appendChild(card);
