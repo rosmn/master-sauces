@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Sauce Picker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Montserrat', sans-serif;
+    background: #121212;
+    color: #eee;
+  }
+
+  h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  select {
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    min-width: 140px;
+    transition: background 0.3s;
+  }
+
+  select:hover {
+    background: rgba(255,255,255,0.2);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: #000;
+    border-radius: 20px;
+    padding: 15px 20px;
+    border: 1px solid #555;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  }
+
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .mood-Spicy { background: #ff4c4c; }
+  .mood-Fresh { background: #1ed760; }
+  .mood-Citrusy { background: #ffb84c; }
+  .mood-Umami { background: #4c9cff; }
+  .mood-Creamy { background: #d84cff; }
+  .mood-Smoky { background: #777; }
+
+  .flavor-Asian { background: #ff6e40; }
+  .flavor-Latin { background: #ffcc29; color:#000; }
+  .flavor-Mediterranean { background: #2ed3c2; color:#000; }
+  .flavor-African { background: #ff7f50; }
+  .flavor-USA { background: #ff5e78; }
+  .flavor-MiddleEast { background: #9b59b6; }
+  .flavor-EasternEurope { background: #95a5a6; }
+
+  @media (max-width: 500px) {
+    .filters {
+      flex-direction: column;
+      align-items: center;
+    }
+    select {
+      width: 90%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Master Sauce Picker</h1>
+
+<div class="filters">
+  <select id="moodFilter">
+    <option value="All">All Moods</option>
+    <option value="Spicy">Spicy</option>
+    <option value="Fresh">Fresh</option>
+    <option value="Citrusy">Citrusy</option>
+    <option value="Umami">Umami</option>
+    <option value="Creamy">Creamy</option>
+    <option value="Smoky">Smoky</option>
+  </select>
+
+  <select id="flavorFilter">
+    <option value="All">All Flavors</option>
+    <option value="Asian">Asian</option>
+    <option value="Latin">Latin</option>
+    <option value="Mediterranean">Mediterranean</option>
+    <option value="African">African</option>
+    <option value="USA">USA</option>
+    <option value="Middle East">Middle East</option>
+    <option value="Eastern Europe">Eastern Europe</option>
+  </select>
+</div>
+
+<div class="cards" id="cardContainer"></div>
+
+<script>
+const sauces = [
+  {name:"🇰🇷 Gochujang Spicy", main:"gochujang, soy, vinegar", optional:"garlic, honey, sesame oil", veggies:"cabbage, carrots, cucumbers", mood:"Spicy", flavor:"Asian"},
+  {name:"🌶 Lime–Chili", main:"lime, chili, garlic", optional:"cilantro, onion", veggies:"cucumbers, carrots, tomatoes", mood:"Spicy / Citrusy", flavor:"Latin"},
+  {name:"🇿🇦 Peri-Peri", main:"chili, lemon, garlic, oil", optional:"smoked paprika, vinegar", veggies:"potatoes, sweet potatoes, cabbage", mood:"Spicy / Smoky / Citrusy", flavor:"African"},
+  {name:"🇺🇸 Sriracha-Mayo Light", main:"light mayo, sriracha, lemon", optional:"garlic", veggies:"potatoes, sweet potatoes, carrots", mood:"Spicy / Creamy", flavor:"USA"},
+  {name:"🇮🇹 Olive Oil–Lemon Herb", main:"olive oil, lemon, garlic", optional:"oregano, parsley", veggies:"tomatoes, lettuce, cucumbers", mood:"Fresh / Citrusy", flavor:"Mediterranean"},
+  {name:"🇬🇷 Garlic Herb", main:"olive oil, garlic, herbs", optional:"lemon, pepper", veggies:"tomatoes, lettuce, carrots", mood:"Fresh", flavor:"Mediterranean"},
+  {name:"🇮🇨 Mojo Verde", main:"cilantro, oil, vinegar", optional:"garlic, cumin", veggies:"potatoes, carrots", mood:"Fresh / Spicy", flavor:"Latin"},
+  {name:"🇯🇵 Soy–Ginger", main:"soy sauce, ginger, garlic", optional:"sesame oil, honey", veggies:"cabbage, broccoli, green beans", mood:"Umami", flavor:"Asian"},
+  {name:"🇯🇵 Miso–Umami", main:"miso, vinegar, soy", optional:"ginger, sesame", veggies:"cabbage, carrots, potatoes", mood:"Umami", flavor:"Asian"},
+  {name:"🇯🇵 Sweet Soy / Teriyaki", main:"soy, sugar, vinegar", optional:"ginger, garlic", veggies:"carrots, broccoli, beans", mood:"Umami", flavor:"Asian"},
+  {name:"🇯🇵 Miso–Tahini", main:"miso, tahini, lemon", optional:"garlic, ginger", veggies:"carrots, cabbage, potatoes", mood:"Creamy / Umami", flavor:"Asian / Middle East"},
+  {name:"🕌 Tahini–Garlic", main:"tahini, lemon, garlic", optional:"cumin, parsley", veggies:"carrots, cabbage, cucumbers", mood:"Creamy / Garlicky", flavor:"Middle East"},
+  {name:"🇬🇷 Tzatziki-Style", main:"yogurt, cucumber, garlic", optional:"dill, mint", veggies:"cucumbers, carrots, potatoes", mood:"Creamy / Fresh", flavor:"Mediterranean"},
+  {name:"🇺🇸 BBQ Style", main:"tomato paste, vinegar, sugar", optional:"paprika, mustard", veggies:"potatoes, cabbage", mood:"Smoky", flavor:"USA"},
+  {name:"🇭🇺 Paprika–Garlic", main:"paprika, garlic, oil", optional:"vinegar, lemon", veggies:"potatoes, cabbage, carrots", mood:"Smoky / Garlicky", flavor:"Eastern Europe"}
+];
+
+const container = document.getElementById('cardContainer');
+
+function renderCards() {
+  container.innerHTML = '';
+  sauces.forEach(sauce => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.classList.add('mood-' + sauce.mood.split(' ')[0]);
+    card.classList.add('flavor-' + sauce.flavor.replace(/\s/g,''));
+    card.innerHTML = `
+      <h3>${sauce.name}</h3>
+      <p><strong>Main:</strong> ${sauce.main}</p>
+      <p><strong>Optional:</strong> ${sauce.optional}</p>
+      <p><strong>Best Veggies:</strong> ${sauce.veggies}</p>
+      <div>
+        <span class="badge mood-${sauce.mood.split(' ')[0]}">${sauce.mood}</span>
+        <span class="badge flavor-${sauce.flavor.replace(/\s/g,'')}">${sauce.flavor}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterCards() {
+  const moodValue = document.getElementById('moodFilter').value;
+  const flavorValue = document.getElementById('flavorFilter').value;
+  const cards = container.querySelectorAll('.card');
+
+  cards.forEach(card => {
+    const mood = card.querySelector('.badge.mood-' + card.classList[1].split('-')[1]).textContent;
+    const flavor = card.querySelector('.badge.flavor-' + card.classList[2].split('-')[1]).textContent;
+    const moodMatch = (moodValue === 'All') || mood.includes(moodValue);
+    const flavorMatch = (flavorValue === 'All') || flavor.includes(flavorValue);
+    card.style.display = (moodMatch && flavorMatch) ? 'flex' : 'none';
+  });
+}
+
+document.getElementById('moodFilter').addEventListener('change', filterCards);
+document.getElementById('flavorFilter').addEventListener('change', filterCards);
+
+renderCards();
+</script>
+
+</body>
+</html>
