@@ -145,6 +145,19 @@
     <option value="Middle East">Middle East</option>
     <option value="Eastern Europe">Eastern Europe</option>
   </select>
+
+  <select id="veggieFilter">
+    <option value="All">All Vegetables</option>
+    <option value="cucumbers">Cucumbers</option>
+    <option value="potatoes">Potatoes</option>
+    <option value="sweet potatoes">Sweet Potatoes</option>
+    <option value="carrots">Carrots</option>
+    <option value="tomatoes">Tomatoes</option>
+    <option value="lettuce">Lettuce</option>
+    <option value="cabbage">Cabbage</option>
+    <option value="celery">Celery</option>
+    <option value="green beans">Green Beans</option>
+  </select>
 </div>
 
 <div class="cards" id="cardContainer"></div>
@@ -177,6 +190,7 @@ function renderCards() {
     // Add data attributes for filtering
     card.dataset.mood = sauce.mood; // keep full string
     card.dataset.flavor = sauce.flavor;
+    card.dataset.veggies = sauce.veggies;
 
     card.innerHTML = `
       <h3>${sauce.name}</h3>
@@ -195,19 +209,25 @@ function renderCards() {
 function filterCards() {
   const moodValue = document.getElementById('moodFilter').value;
   const flavorValue = document.getElementById('flavorFilter').value;
+  const veggieValue = document.getElementById('veggieFilter').value;
   const cards = container.querySelectorAll('.card');
 
   cards.forEach(card => {
     const moods = card.dataset.mood.split('/').map(m => m.trim());
     const flavors = card.dataset.flavor.split('/').map(f => f.trim());
+    const veggies = card.dataset.veggies.split(',').map(v => v.trim().toLowerCase());
+
     const moodMatch = (moodValue === 'All') || moods.includes(moodValue);
     const flavorMatch = (flavorValue === 'All') || flavors.includes(flavorValue);
-    card.style.display = (moodMatch && flavorMatch) ? 'flex' : 'none';
+    const veggieMatch = (veggieValue === 'All') || veggies.includes(veggieValue);
+
+    card.style.display = (moodMatch && flavorMatch && veggieMatch) ? 'flex' : 'none';
   });
 }
 
 document.getElementById('moodFilter').addEventListener('change', filterCards);
 document.getElementById('flavorFilter').addEventListener('change', filterCards);
+document.getElementById('veggieFilter').addEventListener('change', filterCards);
 
 renderCards();
 </script>
