@@ -58,7 +58,7 @@
     border-radius: 20px;
     padding: 15px 20px;
     border: 1px solid #555;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
@@ -174,8 +174,6 @@ function renderCards() {
   sauces.forEach(sauce => {
     const card = document.createElement('div');
     card.classList.add('card');
-    card.classList.add('mood-' + sauce.mood.split(' ')[0]);
-    card.classList.add('flavor-' + sauce.flavor.replace(/\s/g,''));
     card.innerHTML = `
       <h3>${sauce.name}</h3>
       <p><strong>Main:</strong> ${sauce.main}</p>
