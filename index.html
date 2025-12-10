@@ -167,7 +167,6 @@ const sauces = [
   {name:"🇺🇸 BBQ Style", main:"tomato paste, vinegar, sugar", optional:"paprika, mustard", veggies:"potatoes, cabbage", mood:"Smoky", flavor:"USA"},
   {name:"🇭🇺 Paprika–Garlic", main:"paprika, garlic, oil", optional:"vinegar, lemon", veggies:"potatoes, cabbage, carrots", mood:"Smoky / Garlicky", flavor:"Eastern Europe"}
 ];
-
 const container = document.getElementById('cardContainer');
 
 function renderCards() {
@@ -175,16 +174,18 @@ function renderCards() {
   sauces.forEach(sauce => {
     const card = document.createElement('div');
     card.classList.add('card');
-    card.classList.add('mood-' + sauce.mood.split(' ')[0]);
-    card.classList.add('flavor-' + sauce.flavor.replace(/\s/g,''));
+    // Add data attributes for filtering
+    card.dataset.mood = sauce.mood; // keep full string
+    card.dataset.flavor = sauce.flavor;
+
     card.innerHTML = `
       <h3>${sauce.name}</h3>
       <p><strong>Main:</strong> ${sauce.main}</p>
       <p><strong>Optional:</strong> ${sauce.optional}</p>
       <p><strong>Best Veggies:</strong> ${sauce.veggies}</p>
       <div>
-        <span class="badge mood-${sauce.mood.split(' ')[0]} mood__color-${sauce.mood.split(' ')[0]}">${sauce.mood}</span>
-        <span class="badge flavor-${sauce.flavor.replace(/\s/g,'')} flavor__color-${sauce.flavor.replace(/\s/g,'')}">${sauce.flavor}</span>
+        ${sauce.mood.split('/').map(m => `<span class="badge mood__color-${m.trim()}">${m.trim()}</span>`).join(' ')}
+        ${sauce.flavor.split('/').map(f => `<span class="badge flavor__color-${f.trim().replace(/\s/g,'')}">${f.trim()}</span>`).join(' ')}
       </div>
     `;
     container.appendChild(card);
@@ -197,10 +198,10 @@ function filterCards() {
   const cards = container.querySelectorAll('.card');
 
   cards.forEach(card => {
-    const mood = card.querySelector('.badge.mood-' + card.classList[1].split('-')[1]).textContent;
-    const flavor = card.querySelector('.badge.flavor-' + card.classList[2].split('-')[1]).textContent;
-    const moodMatch = (moodValue === 'All') || mood.includes(moodValue);
-    const flavorMatch = (flavorValue === 'All') || flavor.includes(flavorValue);
+    const moods = card.dataset.mood.split('/').map(m => m.trim());
+    const flavors = card.dataset.flavor.split('/').map(f => f.trim());
+    const moodMatch = (moodValue === 'All') || moods.includes(moodValue);
+    const flavorMatch = (flavorValue === 'All') || flavors.includes(flavorValue);
     card.style.display = (moodMatch && flavorMatch) ? 'flex' : 'none';
   });
 }
