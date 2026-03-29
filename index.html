@@ -1,141 +1,321 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>The Sauce Pantry</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
+  :root[data-theme="dark"] {
     --bg: #0c0b0a;
     --surface: #1a1816;
     --card-inner: #24211e;
     --accent: #e9c46a;
     --text-primary: #fdfaf5;
     --text-secondary: #a8a29d;
+    --border: #2d2a27;
+    --dock-bg: rgba(12, 11, 10, 0.98);
+    --option-hover: #2d2a27;
+  }
+  :root[data-theme="light"] {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --card-inner: #f4f0eb;
+    --accent: #8b5e34;
+    --text-primary: #1c1b19;
+    --text-secondary: #6e675f;
+    --border: #e8e2da;
+    --dock-bg: rgba(250, 247, 242, 0.98);
+    --option-hover: #f1ede9;
+  }
+  :root {
     --spicy: #e76f51; --fresh: #2a9d8f; --citrusy: #e9c46a; --umami: #457b9d;
     --creamy: #b5838d; --smoky: #6d6875; --nutty: #bc6c25; --bold: #ef476f;
   }
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-  body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); line-height: 1.4; }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+  body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); line-height: 1.4; transition: background 0.3s; }
+  
+  /* Top Right Theme Switcher */
+  .theme-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+  .theme-switch:hover { border-color: var(--accent); transform: scale(1.05); }
+
   header { padding: 40px 20px 20px; text-align: center; }
   h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; font-style: italic; color: var(--accent); }
   .subtitle { color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
-  .container { padding: 0 20px 240px; max-width: 1400px; margin: 0 auto; }
+
+  .container { padding: 0 20px 220px; max-width: 1400px; margin: 0 auto; }
   .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-  .card { background: var(--surface); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; border: 1px solid #2d2a27; transition: transform 0.2s ease; }
-  .card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 0 0 12px; color: #fff; }
+  
+  .card { background: var(--surface); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; border: 1px solid var(--border); transition: transform 0.2s; }
+  .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 0 0 12px; color: var(--text-primary); }
+  
   .recipe-box { background: var(--card-inner); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
   .recipe-box label { display: block; color: var(--accent); font-size: 10px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
-  .recipe-box p { margin: 0; font-size: 13px; color: #f0f0f0; }
+  .recipe-box p { margin: 0; font-size: 13px; color: var(--text-primary); }
+  
   .pairing-info { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
-  .pairing-info strong { color: #888; font-size: 10px; text-transform: uppercase; }
-  .filter-dock { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(18, 16, 14, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid rgba(233, 196, 106, 0.3); padding: 15px 15px calc(15px + env(safe-area-inset-bottom)); z-index: 1000; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (min-width: 768px) { .filter-dock { grid-template-columns: repeat(4, 1fr); padding-left: 15%; padding-right: 15%; } }
+  .pairing-info strong { color: var(--text-secondary); font-size: 10px; text-transform: uppercase; opacity: 0.7; }
+
+  /* --- DOCK & FILTERS --- */
+  .filter-dock {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--dock-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(233, 196, 106, 0.3);
+    padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .filter-dock { grid-template-columns: repeat(4, 1fr); padding-left: 15%; padding-right: 15%; }
+  }
+
   .dropdown-container { position: relative; }
-  .filter-trigger { width: 100%; background: #2a2724; border: 1px solid #3d3a37; padding: 12px 15px; border-radius: 12px; color: var(--text-primary); font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+
+  .filter-trigger {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 15px;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
   .filter-trigger::after { content: '▾'; font-size: 10px; color: var(--accent); }
-  .filter-menu { position: absolute; bottom: calc(100% + 12px); left: 0; right: 0; background: #1e1c1a; border: 1px solid var(--accent); border-radius: 16px; max-height: 280px; overflow-y: auto; display: none; flex-direction: column; box-shadow: 0 -15px 40px rgba(0,0,0,0.8); z-index: 1001; }
-  .filter-menu::-webkit-scrollbar { width: 5px; }
+
+  .filter-menu {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0; right: 0;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    max-height: 280px;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 -15px 40px rgba(0,0,0,0.6);
+    z-index: 1001;
+  }
+  .filter-menu::-webkit-scrollbar { width: 4px; }
   .filter-menu::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
   .filter-menu.show { display: flex; animation: slideUp 0.2s ease-out; }
   @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .filter-option { padding: 14px 18px; font-size: 13px; color: #bbb; border-bottom: 1px solid #2d2a27; cursor: pointer; }
-  .filter-option:hover { background: #2d2a27; color: var(--accent); }
-  .filter-option.selected { background: #332f2c; color: var(--accent); font-weight: 700; }
+
+  .filter-option { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid var(--border); cursor: pointer; color: var(--text-secondary); }
+  .filter-option:hover { background: var(--option-hover); color: var(--accent); }
+  .filter-option.selected { background: var(--card-inner); color: var(--accent); font-weight: 700; }
   .filter-option.disabled { display: none; }
+
   .badge-row { margin-top: auto; padding-top: 15px; display: flex; flex-wrap: wrap; gap: 6px; }
   .badge { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #fff; }
   .tag-Spicy { background: var(--spicy); } .tag-Fresh { background: var(--fresh); } .tag-Citrusy { background: var(--citrusy); } .tag-Umami { background: var(--umami); }
   .tag-Creamy { background: var(--creamy); } .tag-Smoky { background: var(--smoky); } .tag-Nutty { background: var(--nutty); } .tag-Bold { background: var(--bold); }
-  .tag-Flavor { border: 1px solid #444; color: #aaa; }
+  .tag-Flavor { border: 1px solid var(--border); color: var(--text-secondary); }
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
-<header><h1>The Sauce Pantry</h1><div class="subtitle">Artisanal Global Essentials</div></header>
+
+<button class="theme-switch" id="themeToggle" title="Toggle Theme">☀️</button>
+
+<header>
+  <h1>The Sauce Pantry</h1>
+  <div class="subtitle">Artisanal Global Inspiration</div>
+</header>
+
 <div class="container"><div id="cardContainer" class="recipe-grid"></div></div>
+
 <div class="filter-dock">
-  <div class="dropdown-container"><div class="filter-trigger" id="moodBtn" onclick="toggleMenu('moodMenu')">Moods</div><div class="filter-menu" id="moodMenu"></div></div>
-  <div class="dropdown-container"><div class="filter-trigger" id="flavorBtn" onclick="toggleMenu('flavorMenu')">Flavours</div><div class="filter-menu" id="flavorMenu"></div></div>
-  <div class="dropdown-container"><div class="filter-trigger" id="proteinBtn" onclick="toggleMenu('proteinMenu')">Proteins</div><div class="filter-menu" id="proteinMenu"></div></div>
-  <div class="dropdown-container"><div class="filter-trigger" id="veggieBtn" onclick="toggleMenu('veggieMenu')">Veggies</div><div class="filter-menu" id="veggieMenu"></div></div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="moodBtn" onclick="toggleMenu('moodMenu')">Moods</div>
+    <div class="filter-menu" id="moodMenu"></div>
+  </div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="flavorBtn" onclick="toggleMenu('flavorMenu')">Flavours</div>
+    <div class="filter-menu" id="flavorMenu"></div>
+  </div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="proteinBtn" onclick="toggleMenu('proteinMenu')">Proteins</div>
+    <div class="filter-menu" id="proteinMenu"></div>
+  </div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="veggieBtn" onclick="toggleMenu('veggieMenu')">Veggies</div>
+    <div class="filter-menu" id="veggieMenu"></div>
+  </div>
 </div>
+
 <script>
 const sauces = [
-  { name: "🇰🇷 Classic Gochujang", recipe: "3 tbsp Gochujang, 2 tbsp Soy sauce, 1 tbsp Honey", optional: "Sesame oil, ginger", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous", "Root Vegetables"], mood: ["Spicy", "Umami"], flavor: ["Asian"] },
+  // SPICY (7+)
+  { name: "🇰🇷 Gochujang Glaze", recipe: "3 tbsp Gochujang, 2 tbsp Soy sauce, 1 tbsp Honey", optional: "Sesame oil, ginger", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous", "Root Vegetables"], mood: ["Spicy", "Umami"], flavor: ["Asian"] },
   { name: "🇲🇽 Salsa Macha", recipe: "1 cup Oil, 1/2 cup Dried chilies, 1/4 cup Peanuts", optional: "Garlic, Salt", proteins: ["Red Meat", "Seafood"], veggies: ["Root Vegetables"], mood: ["Spicy", "Nutty", "Smoky"], flavor: ["Latin"] },
-  { name: "🇲🇦 Red Harissa", recipe: "1 cup Roasted red peppers, 3 tbsp Olive oil, 2 tsp Cumin", optional: "Lemon juice, Caraway", proteins: ["Red Meat", "Legumes"], veggies: ["Nightshades"], mood: ["Spicy", "Smoky", "Bold"], flavor: ["African"] },
-  { name: "🇮🇹 Basil Pesto", recipe: "2 cups Fresh basil, 1/2 cup Olive oil, 1/2 cup Parmesan", optional: "Pine nuts, Garlic", proteins: ["Poultry", "Seafood"], veggies: ["Nightshades"], mood: ["Fresh", "Nutty"], flavor: ["Mediterranean"] },
-  { name: "🇦🇷 Chimichurri Verde", recipe: "1 cup Flat parsley, 1/2 cup Olive oil, 1/4 cup Vinegar", optional: "Oregano, Garlic", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Fresh", "Bold"], flavor: ["Latin"] },
-  { name: "🇱🇧 Toum (Garlic Cloud)", recipe: "1 cup Garlic, 3 cups Neutral oil, 1/2 cup Lemon juice", optional: "Iced water for fluffiness", proteins: ["Poultry", "Red Meat"], veggies: ["Root Vegetables"], mood: ["Creamy", "Bold"], flavor: ["Middle East"] },
-  { name: "🇬🇷 Classic Tzatziki", recipe: "1 cup Greek yogurt, 1/2 cup Drained cucumber, 2 tbsp Lemon juice", optional: "Garlic, Fresh dill", proteins: ["Red Meat", "Poultry"], veggies: ["Nightshades"], mood: ["Fresh", "Creamy"], flavor: ["Mediterranean"] },
-  { name: "🇹🇭 Peanut Satay", recipe: "1/2 cup Peanut butter, 1/4 cup Coconut milk, 2 tbsp Soy", optional: "Red curry paste, Lime", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous"], mood: ["Nutty", "Creamy"], flavor: ["Asian"] },
-  { name: "🇯🇵 Miso-Ginger Glaze", recipe: "3 tbsp White miso, 2 tbsp Mirin, 1 tbsp Ginger", optional: "Rice vinegar, Soy", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Fresh"], flavor: ["Asian"] },
-  { name: "🇻🇳 Nuoc Cham", recipe: "1/4 cup Lime juice, 1/4 cup Fish sauce, 2 tbsp Sugar", optional: "Garlic, Chili", proteins: ["Red Meat", "Seafood"], veggies: ["Leafy Greens"], mood: ["Citrusy", "Umami", "Spicy"], flavor: ["Asian"] },
-  { name: "🇪🇸 Romesco", recipe: "2 Roasted red peppers, 1/2 cup Almonds, 1/4 cup Olive oil", optional: "Sherry vinegar, Paprika", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Smoky", "Nutty"], flavor: ["Mediterranean"] },
-  { name: "🇮🇳 Mint Chutney", recipe: "1 cup Mint, 1 cup Cilantro, 1 tbsp Ginger, 2 tbsp Lime", optional: "Green chili, Yogurt", proteins: ["Poultry", "Legumes"], veggies: ["Cruciferous"], mood: ["Fresh", "Citrusy"], flavor: ["Asian"] },
-  { name: "🇺🇸 Bourbon BBQ", recipe: "1 cup Ketchup, 1/4 cup Cider vinegar, 2 tbsp Bourbon", optional: "Brown sugar, Smoked paprika", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Smoky", "Bold"], flavor: ["USA"] },
-  { name: "🇫🇷 Sauce Hollandaise", recipe: "1/2 cup Butter, 3 Egg yolks, 1 tbsp Lemon juice", optional: "Cayenne, White pepper", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Creamy", "Citrusy"], flavor: ["Mediterranean"] },
-  { name: "🇨🇳 Black Pepper Sauce", recipe: "1/4 cup Soy, 2 tbsp Oyster sauce, 1 tbsp Black pepper", optional: "Butter, Garlic", proteins: ["Red Meat", "Tofu"], veggies: ["Alliums"], mood: ["Umami", "Spicy", "Bold"], flavor: ["Asian"] },
-  { name: "🇾🇪 Yemeni Zhoug", recipe: "2 cups Cilantro, 1/2 cup Olive oil, 4 Green chilies", optional: "Cardamom, Garlic", proteins: ["Poultry", "Red Meat"], veggies: ["Nightshades"], mood: ["Spicy", "Fresh"], flavor: ["Middle East"] },
-  { name: "🇺🇸 Sriracha Mayo", recipe: "1/2 cup Mayo, 2 tbsp Sriracha, 1 tsp Lime juice", optional: "Garlic powder", proteins: ["Seafood", "Tofu", "Red Meat"], veggies: ["Cruciferous"], mood: ["Spicy", "Creamy"], flavor: ["USA"] },
-  { name: "🇮🇹 Gremolata Oil", recipe: "1/2 cup Olive oil, 1/2 cup Parsley, 2 tbsp Lemon zest", optional: "Minced garlic", proteins: ["Red Meat", "Seafood"], veggies: ["Root Vegetables"], mood: ["Fresh", "Citrusy"], flavor: ["Mediterranean"] },
-  { name: "🇹🇭 Nam Jim Jaew", recipe: "3 tbsp Lime, 2 tbsp Fish sauce, 1 tbsp Toasted rice powder", optional: "Chili flakes, Shallots", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Spicy", "Citrusy"], flavor: ["Asian"] },
-  { name: "🇲🇽 Chipotle Crema", recipe: "1 cup Sour cream, 2 Chipotles in adobo, 1 tbsp Lime", optional: "Cilantro", proteins: ["Poultry", "Red Meat"], veggies: ["Nightshades"], mood: ["Smoky", "Creamy", "Spicy"], flavor: ["Latin"] },
-  { name: "🇿🇦 Peri-Peri", recipe: "1/2 cup Oil, 1/4 cup Lemon, 4 Birds eye chilies", optional: "Smoked paprika, Oregano", proteins: ["Poultry", "Seafood"], veggies: ["Root Vegetables"], mood: ["Spicy", "Citrusy", "Smoky"], flavor: ["African"] },
-  { name: "🇯🇵 Ponzu Sauce", recipe: "1/2 cup Soy sauce, 1/4 cup Lemon juice, 2 tbsp Mirin", optional: "Bonito flakes, Kombu", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Citrusy"], flavor: ["Asian"] },
-  { name: "🇮🇹 Balsamic Glaze", recipe: "1 cup Balsamic vinegar, 2 tbsp Honey", optional: "Sprig of thyme", proteins: ["Red Meat", "Poultry"], veggies: ["Root Vegetables", "Nightshades"], mood: ["Umami", "Bold"], flavor: ["Mediterranean"] },
-  { name: "🇺🇸 Garlic Butter", recipe: "1/2 cup Butter, 4 cloves Garlic, 1 tsp Parsley", optional: "Lemon zest", proteins: ["Seafood", "Red Meat", "Poultry"], veggies: ["Cruciferous"], mood: ["Creamy", "Bold"], flavor: ["USA"] },
-  { name: "🇪🇬 Nutty Dukkah Oil", recipe: "1/2 cup Olive oil, 1/4 cup Dukkah spice (Hazelnuts/Seeds)", optional: "Salt", proteins: ["Poultry", "Legumes"], veggies: ["Root Vegetables"], mood: ["Nutty", "Smoky"], flavor: ["African"] }
+  { name: "🇲🇦 Red Harissa", recipe: "1 cup Roasted peppers, 3 tbsp Oil, 2 tsp Cumin", optional: "Lemon, Caraway", proteins: ["Red Meat", "Legumes"], veggies: ["Nightshades"], mood: ["Spicy", "Smoky", "Bold"], flavor: ["African"] },
+  { name: "🇹🇭 Nam Jim Jaew", recipe: "3 tbsp Lime juice, 2 tbsp Fish sauce, 1 tbsp Toasted rice", optional: "Chili flakes, Shallots", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Spicy", "Citrusy"], flavor: ["Asian"] },
+  { name: "🇾🇪 Yemeni Zhoug", recipe: "2 cups Cilantro, 4 Green chilies, 1/2 cup Oil", optional: "Cardamom, Garlic", proteins: ["Poultry", "Red Meat"], veggies: ["Nightshades"], mood: ["Spicy", "Fresh"], flavor: ["Middle East"] },
+  { name: "🇺🇸 Buffalo Heat", recipe: "1/2 cup Hot sauce, 4 tbsp Melted butter", optional: "Vinegar", proteins: ["Poultry", "Seafood"], veggies: ["Cruciferous"], mood: ["Spicy", "Bold"], flavor: ["USA"] },
+  { name: "🇮🇩 Sambal Bajak", recipe: "1 cup Chilies, 2 tbsp Shrimp Paste, 1 tbsp Sugar", optional: "Lemongrass", proteins: ["Seafood", "Poultry"], veggies: ["Leafy Greens"], mood: ["Spicy", "Umami", "Smoky"], flavor: ["Asian"] },
+
+  // FRESH (7+)
+  { name: "🇮🇹 Basil Pesto", recipe: "2 cups Basil, 1/2 cup Oil, 1/2 cup Parmesan", optional: "Pine nuts, Garlic", proteins: ["Poultry", "Seafood"], veggies: ["Nightshades"], mood: ["Fresh", "Nutty"], flavor: ["Mediterranean"] },
+  { name: "🇦🇷 Chimichurri Verde", recipe: "1 cup Parsley, 1/2 cup Oil, 1/4 cup Vinegar", optional: "Oregano, Garlic", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Fresh", "Bold"], flavor: ["Latin"] },
+  { name: "🇮🇳 Mint Chutney", recipe: "1 cup Mint, 1 cup Cilantro, 2 tbsp Lime", optional: "Ginger, Green Chili", proteins: ["Poultry", "Legumes"], veggies: ["Cruciferous"], mood: ["Fresh", "Citrusy"], flavor: ["Asian"] },
+  { name: "🇲🇽 Tomatillo Salsa", recipe: "5 Tomatillos, 1 Jalapeno, 1/2 cup Cilantro", optional: "Onion, Garlic", proteins: ["Poultry", "Red Meat"], veggies: ["Nightshades"], mood: ["Fresh", "Citrusy"], flavor: ["Latin"] },
+  { name: "🇮🇹 Gremolata Oil", recipe: "1/2 cup Oil, 1/2 cup Parsley, 2 tbsp Lemon zest", optional: "Minced garlic", proteins: ["Red Meat", "Seafood"], veggies: ["Root Vegetables"], mood: ["Fresh", "Citrusy"], flavor: ["Mediterranean"] },
+  { name: "🇫🇷 Persillade", recipe: "1/2 cup Parsley, 4 cloves Garlic, 2 tbsp Oil", optional: "Unsalted butter", proteins: ["Poultry", "Seafood"], veggies: ["Root Vegetables"], mood: ["Fresh", "Bold"], flavor: ["Mediterranean"] },
+  { name: "🇻🇳 Herb Nuoc Cham", recipe: "1/4 cup Lime, 1/4 cup Fish Sauce, 2 tbsp Sugar", optional: "Garlic, Bird's eye chili", proteins: ["Red Meat", "Seafood"], veggies: ["Leafy Greens"], mood: ["Fresh", "Umami"], flavor: ["Asian"] },
+
+  // CREAMY (7+)
+  { name: "🇱🇧 Toum (Garlic)", recipe: "1 cup Garlic, 3 cups Neutral Oil, 1/2 cup Lemon", optional: "Iced water", proteins: ["Poultry", "Red Meat"], veggies: ["Root Vegetables"], mood: ["Creamy", "Bold"], flavor: ["Middle East"] },
+  { name: "🇬🇷 Classic Tzatziki", recipe: "1 cup Greek Yogurt, 1/2 cup Cucumber, 2 tbsp Lemon", optional: "Dill, Mint", proteins: ["Red Meat", "Poultry"], veggies: ["Nightshades"], mood: ["Creamy", "Fresh"], flavor: ["Mediterranean"] },
+  { name: "🕌 Tahini-Lemon", recipe: "1/2 cup Tahini, 1/4 cup Water, 3 tbsp Lemon", optional: "Cumin, Garlic", proteins: ["Legumes", "Poultry"], veggies: ["Nightshades"], mood: ["Creamy", "Nutty"], flavor: ["Middle East"] },
+  { name: "🇫🇷 Hollandaise", recipe: "1/2 cup Butter, 3 Egg yolks, 1 tbsp Lemon", optional: "Cayenne pepper", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Creamy", "Citrusy"], flavor: ["Mediterranean"] },
+  { name: "🇺🇸 Sriracha Mayo", recipe: "1/2 cup Mayo, 2 tbsp Sriracha, 1 tsp Lime", optional: "Garlic powder", proteins: ["Seafood", "Tofu", "Red Meat"], veggies: ["Cruciferous"], mood: ["Creamy", "Spicy"], flavor: ["USA"] },
+  { name: "🇬🇪 Bazhe (Walnut)", recipe: "1 cup Walnuts, 1/2 cup Water, 2 cloves Garlic", optional: "Coriander", proteins: ["Poultry", "Tofu"], veggies: ["Nightshades"], mood: ["Creamy", "Nutty"], flavor: ["Eastern Europe"] },
+  { name: "🇮🇳 Coconut Korma", recipe: "1 cup Coconut Milk, 2 tbsp Cashew paste, 1 tsp Turmeric", optional: "Cinnamon", proteins: ["Poultry", "Legumes"], veggies: ["Root Vegetables"], mood: ["Creamy", "Nutty"], flavor: ["Asian"] },
+
+  // UMAMI (7+)
+  { name: "🇯🇵 Miso-Ginger", recipe: "3 tbsp White Miso, 2 tbsp Mirin, 1 tbsp Ginger", optional: "Soy Sauce", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Fresh"], flavor: ["Asian"] },
+  { name: "🇨🇳 Black Pepper", recipe: "1/4 cup Soy, 2 tbsp Oyster Sauce, 1 tbsp Pepper", optional: "Butter, Garlic", proteins: ["Red Meat", "Tofu"], veggies: ["Alliums"], mood: ["Umami", "Spicy", "Bold"], flavor: ["Asian"] },
+  { name: "🇮🇹 Bagna Cauda", recipe: "1/2 cup Oil, 1/4 cup Butter, 6 Anchovies", optional: "Minced Garlic", proteins: ["Seafood"], veggies: ["Cruciferous"], mood: ["Umami", "Bold"], flavor: ["Mediterranean"] },
+  { name: "🇯🇵 Ponzu", recipe: "1/2 cup Soy, 1/4 cup Lemon, 2 tbsp Mirin", optional: "Kombu, Bonito", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Citrusy"], flavor: ["Asian"] },
+  { name: "🇬🇧 Savory Gravy", recipe: "1 cup Broth, 2 tbsp Soy, 1 tbsp Butter", optional: "Thyme, Flour", proteins: ["Red Meat", "Tofu"], veggies: ["Root Vegetables"], mood: ["Umami", "Creamy"], flavor: ["USA"] },
+  { name: "🇮🇹 Balsamic Glaze", recipe: "1 cup Balsamic Vinegar, 2 tbsp Honey", optional: "Thyme", proteins: ["Red Meat", "Poultry"], veggies: ["Nightshades"], mood: ["Umami", "Bold"], flavor: ["Mediterranean"] },
+  { name: "🇯🇵 Sweet Teriyaki", recipe: "1/2 cup Soy, 1/4 cup Water, 3 tbsp Sugar", optional: "Ginger, Garlic", proteins: ["Poultry", "Seafood"], veggies: ["Cruciferous"], mood: ["Umami", "Bold"], flavor: ["Asian"] },
+
+  // SMOKY (7+)
+  { name: "🇺🇸 Bourbon BBQ", recipe: "1 cup Ketchup, 1/4 cup Vinegar, 2 tbsp Bourbon", optional: "Brown Sugar", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Smoky", "Bold"], flavor: ["USA"] },
+  { name: "🇪🇸 Romesco", recipe: "2 Roasted Peppers, 1/2 cup Almonds, 1/4 cup Oil", optional: "Sherry Vinegar, Paprika", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Smoky", "Nutty"], flavor: ["Mediterranean"] },
+  { name: "🇲🇽 Chipotle Crema", recipe: "1 cup Sour Cream, 2 Chipotles in adobo", optional: "Lime Juice", proteins: ["Poultry", "Red Meat"], veggies: ["Nightshades"], mood: ["Smoky", "Creamy", "Spicy"], flavor: ["Latin"] },
+  { name: "🇭🇺 Paprika Oil", recipe: "1/2 cup Oil, 2 tbsp Smoked Paprika, 4 Garlic", optional: "Salt", proteins: ["Red Meat", "Poultry"], veggies: ["Root Vegetables"], mood: ["Smoky", "Bold"], flavor: ["Eastern Europe"] },
+  { name: "🇪🇬 Dukkah Oil", recipe: "1/2 cup Oil, 1/4 cup Nut/Spice mix", optional: "Honey", proteins: ["Poultry", "Legumes"], veggies: ["Root Vegetables"], mood: ["Smoky", "Nutty"], flavor: ["African"] },
+  { name: "🇱🇧 Baba Ganoush", recipe: "1 Roasted Eggplant, 2 tbsp Tahini, 1 tbsp Lemon", optional: "Olive Oil, Garlic", proteins: ["Legumes", "Poultry"], veggies: ["Nightshades"], mood: ["Smoky", "Creamy"], flavor: ["Middle East"] },
+  { name: "🇲🇽 Adobo Paste", recipe: "3 Ancho chilies, 1/4 cup Vinegar, 1 tsp Oregano", optional: "Cumin, Garlic", proteins: ["Red Meat", "Poultry"], veggies: ["Root Vegetables"], mood: ["Smoky", "Spicy"], flavor: ["Latin"] }
 ];
+
 const currentFilters = { mood: 'All', flavor: 'All', protein: 'All', veggie: 'All' };
+
+// Theme Toggle Logic
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.onclick = () => {
+  const root = document.documentElement;
+  const isDark = root.getAttribute('data-theme') === 'dark';
+  const target = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', target);
+  themeBtn.textContent = target === 'dark' ? '☀️' : '🌙';
+};
+
 function toggleMenu(id) {
   const menu = document.getElementById(id);
   const isOpen = menu.classList.contains('show');
   document.querySelectorAll('.filter-menu').forEach(m => m.classList.remove('show'));
   if (!isOpen) menu.classList.add('show');
 }
-window.onclick = function(e) { if (!e.target.closest('.dropdown-container')) document.querySelectorAll('.filter-menu').forEach(m => m.classList.remove('show')); }
+
+window.onclick = function(event) {
+  if (!event.target.closest('.dropdown-container')) {
+    document.querySelectorAll('.filter-menu').forEach(m => m.classList.remove('show'));
+  }
+}
+
 function init() {
   const sets = { mood: new Set(), flavor: new Set(), protein: new Set(), veggie: new Set() };
   const container = document.getElementById('cardContainer');
+
   sauces.forEach(s => {
-    s.mood.forEach(m => sets.mood.add(m)); s.flavor.forEach(f => sets.flavor.add(f));
-    s.proteins.forEach(p => sets.protein.add(p)); s.veggies.forEach(v => sets.veggie.add(v));
-    const card = document.createElement('div'); card.className = 'card';
+    s.mood.forEach(m => sets.mood.add(m));
+    s.flavor.forEach(f => sets.flavor.add(f));
+    s.proteins.forEach(p => sets.protein.add(p));
+    s.veggies.forEach(v => sets.veggie.add(v));
+
+    const card = document.createElement('div');
+    card.className = 'card';
     card.dataset.info = JSON.stringify({mood: s.mood, flavor: s.flavor, protein: s.proteins, veggie: s.veggies});
-    card.innerHTML = `<h3>${s.name}</h3><div class="recipe-box"><label>Recipe</label><p>${s.recipe}</p></div><div class="recipe-box"><label>Enhance</label><p>${s.optional}</p></div><div class="pairing-info"><strong>Pairs With</strong><div>${s.proteins.join(' • ')}</div><div>${s.veggies.join(' • ')}</div></div><div class="badge-row">${s.mood.map(m => `<span class="badge tag-${m}">${m}</span>`).join('')}${s.flavor.map(f => `<span class="badge tag-Flavor">${f}</span>`).join('')}</div>`;
+    card.innerHTML = `
+      <h3>${s.name}</h3>
+      <div class="recipe-box"><label>Recipe</label><p>${s.recipe}</p></div>
+      <div class="recipe-box"><label>Enhance</label><p>${s.optional}</p></div>
+      <div class="pairing-info">
+        <strong>Pairs With</strong>
+        <div>${s.proteins.join(' • ')}</div>
+        <div>${s.veggies.join(' • ')}</div>
+      </div>
+      <div class="badge-row">
+        ${s.mood.map(m => `<span class="badge tag-${m}">${m}</span>`).join('')}
+        ${s.flavor.map(f => `<span class="badge tag-Flavor">${f}</span>`).join('')}
+      </div>
+    `;
     container.appendChild(card);
   });
+
   Object.keys(sets).forEach(key => populateMenu(key, sets[key]));
 }
+
 function populateMenu(type, data) {
   const menu = document.getElementById(type + 'Menu');
   const labels = {mood: 'Moods', flavor: 'Flavours', protein: 'Proteins', veggie: 'Veggies'};
+  
   const allLabel = 'All ' + labels[type];
-  const allOpt = document.createElement('div'); allOpt.className = 'filter-option selected'; allOpt.textContent = allLabel;
+  const allOpt = document.createElement('div');
+  allOpt.className = 'filter-option selected';
+  allOpt.textContent = allLabel;
   allOpt.onclick = (e) => { e.stopPropagation(); selectOption(type, 'All', allLabel); };
   menu.appendChild(allOpt);
+
   Array.from(data).sort().forEach(val => {
-    const opt = document.createElement('div'); opt.className = 'filter-option'; opt.textContent = val;
+    const opt = document.createElement('div');
+    opt.className = 'filter-option';
+    opt.textContent = val;
     opt.onclick = (e) => { e.stopPropagation(); selectOption(type, val, val); };
     menu.appendChild(opt);
   });
 }
+
 function selectOption(type, val, label) {
   currentFilters[type] = val;
   const menu = document.getElementById(type + 'Menu');
   const trigger = document.getElementById(type + 'Btn');
   const baseLabels = {mood: 'Moods', flavor: 'Flavours', protein: 'Proteins', veggie: 'Veggies'};
+  
   trigger.textContent = val === 'All' ? baseLabels[type] : val;
   Array.from(menu.children).forEach(child => child.classList.toggle('selected', child.textContent === label));
+  
   menu.classList.remove('show');
   updateUI();
 }
+
 function updateUI() {
   document.querySelectorAll('.card').forEach(card => {
     const data = JSON.parse(card.dataset.info);
@@ -145,10 +325,12 @@ function updateUI() {
                   (currentFilters.veggie === 'All' || data.veggie.includes(currentFilters.veggie));
     card.classList.toggle('hidden', !match);
   });
+
   Object.keys(currentFilters).forEach(key => {
     const menu = document.getElementById(key + 'Menu');
     const otherKeys = Object.keys(currentFilters).filter(k => k !== key);
     const validValues = new Set();
+
     sauces.forEach(s => {
       const matchOthers = otherKeys.every(k => {
         const checkKey = k === 'veggie' ? 'veggies' : (k === 'protein' ? 'proteins' : k);
@@ -159,9 +341,14 @@ function updateUI() {
         s[dataKey].forEach(v => validValues.add(v));
       }
     });
-    Array.from(menu.children).forEach(opt => { if (!opt.textContent.startsWith('All')) opt.classList.toggle('disabled', !validValues.has(opt.textContent)); });
+
+    Array.from(menu.children).forEach(opt => {
+      if (opt.textContent.startsWith('All')) return;
+      opt.classList.toggle('disabled', !validValues.has(opt.textContent));
+    });
   });
 }
+
 init();
 </script>
 </body>
