@@ -14,7 +14,6 @@
     --text-primary: #fdfaf5;
     --text-secondary: #a8a29d;
     
-    /* Vibrant Pill Colors */
     --spicy: #e76f51;    --fresh: #2a9d8f;
     --citrusy: #e9c46a;  --umami: #457b9d;
     --creamy: #b5838d;   --smoky: #6d6875;
@@ -23,25 +22,24 @@
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+  /* Custom Page Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
   body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text-primary);
     line-height: 1.4;
-    overflow-x: hidden;
   }
 
   header { padding: 40px 20px 20px; text-align: center; }
   h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; font-style: italic; color: var(--accent); }
-  .subtitle { color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
+  .subtitle { color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
 
-  .container {
-    padding: 0 20px 200px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+  .container { padding: 0 20px 240px; max-width: 1400px; margin: 0 auto; }
 
   .recipe-grid {
     display: grid;
@@ -56,48 +54,47 @@
     display: flex;
     flex-direction: column;
     border: 1px solid #2d2a27;
+    transition: transform 0.2s ease;
   }
 
   .card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 0 0 12px; color: #fff; }
   .recipe-box { background: var(--card-inner); padding: 12px; border-radius: 12px; margin-bottom: 10px; }
   .recipe-box label { display: block; color: var(--accent); font-size: 10px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
   .recipe-box p { margin: 0; font-size: 13px; color: #f0f0f0; }
+
   .pairing-info { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
   .pairing-info strong { color: #888; font-size: 10px; text-transform: uppercase; }
 
-  /* --- STYLISH CUSTOM FILTER DOCK --- */
+  /* --- BOTTOM DOCK --- */
   .filter-dock {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background: rgba(22, 20, 18, 0.9);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(233, 196, 106, 0.2);
+    background: rgba(18, 16, 14, 0.98);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid rgba(233, 196, 106, 0.3);
     padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
     z-index: 1000;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
   }
 
   @media (min-width: 768px) {
-    .filter-dock { grid-template-columns: repeat(4, 1fr); max-width: 800px; margin: 0 auto; border-radius: 20px 20px 0 0; }
+    .filter-dock { grid-template-columns: repeat(4, 1fr); padding-left: 15%; padding-right: 15%; }
   }
 
   .dropdown-container { position: relative; }
 
-  /* The Button/Trigger */
   .filter-trigger {
     width: 100%;
     background: #2a2724;
     border: 1px solid #3d3a37;
-    padding: 12px;
+    padding: 12px 15px;
     border-radius: 12px;
     color: var(--text-primary);
     font-size: 13px;
     font-weight: 600;
-    text-align: left;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -105,21 +102,26 @@
   }
   .filter-trigger::after { content: '▾'; font-size: 10px; color: var(--accent); }
 
-  /* The Custom Menu (Opens Upward) */
+  /* CUSTOM DROPDOWN MENU */
   .filter-menu {
     position: absolute;
-    bottom: calc(100% + 10px);
+    bottom: calc(100% + 12px);
     left: 0; right: 0;
-    background: #2a2724;
+    background: #1e1c1a;
     border: 1px solid var(--accent);
-    border-radius: 14px;
-    max-height: 250px;
+    border-radius: 16px;
+    max-height: 280px;
     overflow-y: auto;
-    display: none; /* Hidden by default */
+    display: none;
     flex-direction: column;
-    box-shadow: 0 -10px 25px rgba(0,0,0,0.6);
+    box-shadow: 0 -15px 40px rgba(0,0,0,0.8);
     z-index: 1001;
   }
+
+  /* CUSTOM DROPDOWN SCROLLBAR */
+  .filter-menu::-webkit-scrollbar { width: 5px; }
+  .filter-menu::-webkit-scrollbar-track { background: transparent; }
+  .filter-menu::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
   .filter-menu.show { display: flex; animation: slideUp 0.2s ease-out; }
 
@@ -129,19 +131,20 @@
   }
 
   .filter-option {
-    padding: 14px 15px;
+    padding: 14px 18px;
     font-size: 13px;
-    border-bottom: 1px solid #333;
-    color: #ccc;
+    color: #bbb;
+    border-bottom: 1px solid #2d2a27;
     cursor: pointer;
+    transition: background 0.2s;
   }
-  .filter-option:last-child { border-bottom: none; }
-  .filter-option:hover, .filter-option.selected { background: #3d3a37; color: var(--accent); }
-  .filter-option.disabled { display: none; } /* Smart Hide */
+  .filter-option:hover { background: #2d2a27; color: var(--accent); }
+  .filter-option.selected { background: #332f2c; color: var(--accent); font-weight: 700; }
+  .filter-option.disabled { display: none; }
 
-  /* Badges */
   .badge-row { margin-top: auto; padding-top: 15px; display: flex; flex-wrap: wrap; gap: 6px; }
   .badge { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #fff; }
+  
   .tag-Spicy { background: var(--spicy); }
   .tag-Fresh { background: var(--fresh); }
   .tag-Citrusy { background: var(--citrusy); }
@@ -159,46 +162,49 @@
 
 <header>
   <h1>The Sauce Pantry</h1>
-  <div class="subtitle">Artisanal Flavor Picker</div>
+  <div class="subtitle">Artisanal Global Essentials</div>
 </header>
 
 <div class="container">
   <div id="cardContainer" class="recipe-grid"></div>
 </div>
 
-<!-- Custom Filter Dock -->
 <div class="filter-dock">
-  <div class="dropdown-container" id="moodDropdown">
-    <div class="filter-trigger" onclick="toggleMenu('moodMenu')">Moods</div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="moodBtn" onclick="toggleMenu('moodMenu')">Moods</div>
     <div class="filter-menu" id="moodMenu"></div>
   </div>
-  <div class="dropdown-container" id="flavorDropdown">
-    <div class="filter-trigger" onclick="toggleMenu('flavorMenu')">Flavours</div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="flavorBtn" onclick="toggleMenu('flavorMenu')">Flavours</div>
     <div class="filter-menu" id="flavorMenu"></div>
   </div>
-  <div class="dropdown-container" id="proteinDropdown">
-    <div class="filter-trigger" onclick="toggleMenu('proteinMenu')">Proteins</div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="proteinBtn" onclick="toggleMenu('proteinMenu')">Proteins</div>
     <div class="filter-menu" id="proteinMenu"></div>
   </div>
-  <div class="dropdown-container" id="veggieDropdown">
-    <div class="filter-trigger" onclick="toggleMenu('veggieMenu')">Veggies</div>
+  <div class="dropdown-container">
+    <div class="filter-trigger" id="veggieBtn" onclick="toggleMenu('veggieMenu')">Veggies</div>
     <div class="filter-menu" id="veggieMenu"></div>
   </div>
 </div>
 
 <script>
 const sauces = [
-  { name: "🇰🇷 Gochujang Glaze", recipe: "3 tbsp Gochujang, 2 tbsp Soy sauce, 1 tbsp Honey", optional: "Sesame oil", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous", "Root Vegetables"], mood: ["Spicy", "Umami"], flavor: ["Asian"] },
+  { name: "🇰🇷 Gochujang Glaze", recipe: "3 tbsp Gochujang, 2 tbsp Soy sauce, 1 tbsp Honey", optional: "Sesame oil, ginger", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous", "Root Vegetables"], mood: ["Spicy", "Umami"], flavor: ["Asian"] },
   { name: "🇲🇽 Salsa Macha", recipe: "1 cup Oil, 1/2 cup Dried chilies, 1/4 cup Peanuts", optional: "Garlic, Salt", proteins: ["Red Meat", "Seafood"], veggies: ["Root Vegetables"], mood: ["Spicy", "Nutty", "Smoky"], flavor: ["Latin"] },
-  { name: "🇲🇦 Red Harissa", recipe: "1 cup Roasted red peppers, 3 tbsp Olive oil, 2 tsp Cumin", optional: "Lemon juice", proteins: ["Red Meat", "Legumes"], veggies: ["Nightshades"], mood: ["Spicy", "Smoky"], flavor: ["African"] },
+  { name: "🇲🇦 Red Harissa", recipe: "1 cup Roasted red peppers, 3 tbsp Olive oil, 2 tsp Cumin", optional: "Lemon juice, Caraway", proteins: ["Red Meat", "Legumes"], veggies: ["Nightshades"], mood: ["Spicy", "Smoky"], flavor: ["African"] },
   { name: "🇮🇹 Basil Pesto", recipe: "2 cups Fresh basil, 1/2 cup Olive oil, 1/2 cup Parmesan", optional: "Pine nuts, Garlic", proteins: ["Poultry", "Seafood"], veggies: ["Nightshades"], mood: ["Fresh", "Nutty"], flavor: ["Mediterranean"] },
-  { name: "🇦🇷 Chimichurri Verde", recipe: "1 cup Parsley, 1/2 cup Olive oil, 1/4 cup Vinegar", optional: "Oregano, Garlic", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Fresh", "Bold"], flavor: ["Latin"] },
-  { name: "🇱🇧 Toum (Garlic Cloud)", recipe: "1 cup Garlic, 3 cups Oil, 1/2 cup Lemon juice", optional: "Ice water", proteins: ["Poultry", "Red Meat"], veggies: ["Root Vegetables"], mood: ["Creamy", "Bold"], flavor: ["Middle East"] },
-  { name: "🇬🇷 Classic Tzatziki", recipe: "1 cup Greek yogurt, 1/2 cup Cucumber, 2 tbsp Lemon juice", optional: "Garlic, Dill", proteins: ["Red Meat", "Poultry"], veggies: ["Nightshades"], mood: ["Creamy", "Fresh"], flavor: ["Mediterranean"] },
-  { name: "🇹🇭 Peanut Satay", recipe: "1/2 cup Peanut butter, 1/4 cup Coconut milk, 2 tbsp Soy", optional: "Lime, Chili paste", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous"], mood: ["Nutty", "Creamy"], flavor: ["Asian"] },
-  { name: "🇯🇵 Miso-Ginger Glaze", recipe: "3 tbsp White miso, 2 tbsp Mirin, 1 tbsp Ginger", optional: "Rice vinegar", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Fresh"], flavor: ["Asian"] },
+  { name: "🇦🇷 Chimichurri Verde", recipe: "1 cup Flat parsley, 1/2 cup Olive oil, 1/4 cup Vinegar", optional: "Oregano, Garlic", proteins: ["Red Meat"], veggies: ["Root Vegetables"], mood: ["Fresh", "Bold"], flavor: ["Latin"] },
+  { name: "🇱🇧 Toum (Garlic Cloud)", recipe: "1 cup Garlic, 3 cups Neutral oil, 1/2 cup Lemon juice", optional: "Iced water for fluffiness", proteins: ["Poultry", "Red Meat"], veggies: ["Root Vegetables"], mood: ["Creamy", "Bold"], flavor: ["Middle East"] },
+  { name: "🇬🇷 Classic Tzatziki", recipe: "1 cup Greek yogurt, 1/2 cup Drained cucumber, 2 tbsp Lemon juice", optional: "Garlic, Fresh dill", proteins: ["Red Meat", "Poultry"], veggies: ["Nightshades"], mood: ["Fresh", "Creamy"], flavor: ["Mediterranean"] },
+  { name: "🇹🇭 Peanut Satay", recipe: "1/2 cup Peanut butter, 1/4 cup Coconut milk, 2 tbsp Soy", optional: "Red curry paste, Lime", proteins: ["Poultry", "Tofu"], veggies: ["Cruciferous"], mood: ["Nutty", "Creamy"], flavor: ["Asian"] },
+  { name: "🇯🇵 Miso-Ginger Glaze", recipe: "3 tbsp White miso, 2 tbsp Mirin, 1 tbsp Ginger", optional: "Rice vinegar, Soy", proteins: ["Seafood", "Tofu"], veggies: ["Cruciferous"], mood: ["Umami", "Fresh"], flavor: ["Asian"] },
   { name: "🇻🇳 Nuoc Cham", recipe: "1/4 cup Lime juice, 1/4 cup Fish sauce, 2 tbsp Sugar", optional: "Garlic, Chili", proteins: ["Pork", "Seafood"], veggies: ["Leafy Greens"], mood: ["Citrusy", "Umami"], flavor: ["Asian"] },
-  { name: "🇺🇸 Bourbon BBQ", recipe: "1 cup Ketchup, 1/4 cup Cider vinegar, 2 tbsp Bourbon", optional: "Brown sugar", proteins: ["Red Meat", "Pork"], veggies: ["Root Vegetables"], mood: ["Smoky", "Bold"], flavor: ["USA"] }
+  { name: "🇪🇸 Romesco", recipe: "2 Roasted red peppers, 1/2 cup Almonds, 1/4 cup Olive oil", optional: "Sherry vinegar, Paprika", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Smoky", "Nutty"], flavor: ["Mediterranean"] },
+  { name: "🇮🇳 Mint Chutney", recipe: "1 cup Mint, 1 cup Cilantro, 1 tbsp Ginger, 2 tbsp Lime", optional: "Green chili, Yogurt", proteins: ["Poultry", "Legumes"], veggies: ["Cruciferous"], mood: ["Fresh", "Citrusy"], flavor: ["Asian"] },
+  { name: "🇺🇸 Bourbon BBQ", recipe: "1 cup Ketchup, 1/4 cup Cider vinegar, 2 tbsp Bourbon", optional: "Brown sugar, Smoked paprika", proteins: ["Red Meat", "Pork"], veggies: ["Root Vegetables"], mood: ["Smoky", "Bold"], flavor: ["USA"] },
+  { name: "🇫🇷 Sauce Hollandaise", recipe: "1/2 cup Butter, 3 Egg yolks, 1 tbsp Lemon juice", optional: "Cayenne, White pepper", proteins: ["Seafood", "Poultry"], veggies: ["Cruciferous"], mood: ["Creamy", "Citrusy"], flavor: ["Mediterranean"] },
+  { name: "🇨🇳 Black Pepper Sauce", recipe: "1/4 cup Soy, 2 tbsp Oyster sauce, 1 tbsp Black pepper", optional: "Butter, Garlic", proteins: ["Red Meat", "Tofu"], veggies: ["Alliums"], mood: ["Umami", "Spicy"], flavor: ["Asian"] }
 ];
 
 const currentFilters = { mood: 'All', flavor: 'All', protein: 'All', veggie: 'All' };
@@ -210,9 +216,8 @@ function toggleMenu(id) {
   if (!isOpen) menu.classList.add('show');
 }
 
-// Close menus when clicking outside
 window.onclick = function(event) {
-  if (!event.target.matches('.filter-trigger')) {
+  if (!event.target.closest('.dropdown-container')) {
     document.querySelectorAll('.filter-menu').forEach(m => m.classList.remove('show'));
   }
 }
@@ -252,13 +257,13 @@ function init() {
 
 function populateMenu(type, data) {
   const menu = document.getElementById(type + 'Menu');
-  const trigger = menu.previousElementSibling;
+  const labels = {mood: 'Moods', flavor: 'Flavours', protein: 'Proteins', veggie: 'Veggies'};
   
-  // Create "All" option
+  const allLabel = 'All ' + labels[type];
   const allOpt = document.createElement('div');
   allOpt.className = 'filter-option selected';
-  allOpt.textContent = 'All ' + (type === 'veggie' ? 'Veggies' : type.charAt(0).toUpperCase() + type.slice(1) + 's');
-  allOpt.onclick = () => selectOption(type, 'All', allOpt.textContent);
+  allOpt.textContent = allLabel;
+  allOpt.onclick = () => selectOption(type, 'All', allLabel);
   menu.appendChild(allOpt);
 
   Array.from(data).sort().forEach(val => {
@@ -273,17 +278,15 @@ function populateMenu(type, data) {
 function selectOption(type, val, label) {
   currentFilters[type] = val;
   const menu = document.getElementById(type + 'Menu');
-  const trigger = menu.previousElementSibling;
-  trigger.textContent = label;
+  const trigger = document.getElementById(type + 'Btn');
+  const baseLabels = {mood: 'Moods', flavor: 'Flavours', protein: 'Proteins', veggie: 'Veggies'};
+  trigger.textContent = val === 'All' ? baseLabels[type] : val;
 
-  // Visual feedback for selected
   Array.from(menu.children).forEach(child => child.classList.toggle('selected', child.textContent === label));
-
   updateUI();
 }
 
 function updateUI() {
-  // Filter Cards
   document.querySelectorAll('.card').forEach(card => {
     const data = JSON.parse(card.dataset.info);
     const match = (currentFilters.mood === 'All' || data.mood.includes(currentFilters.mood)) &&
@@ -293,12 +296,11 @@ function updateUI() {
     card.classList.toggle('hidden', !match);
   });
 
-  // Smart Filter Logic: Hide options that lead to 0 results
   Object.keys(currentFilters).forEach(key => {
     const menu = document.getElementById(key + 'Menu');
     const otherKeys = Object.keys(currentFilters).filter(k => k !== key);
-    
     const validValues = new Set();
+
     sauces.forEach(s => {
       const matchOthers = otherKeys.every(k => {
         const checkKey = k === 'veggie' ? 'veggies' : (k === 'protein' ? 'proteins' : k);
@@ -321,4 +323,3 @@ init();
 </script>
 </body>
 </html>
-```
