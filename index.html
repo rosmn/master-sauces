@@ -122,12 +122,10 @@
 </style>
 </head>
 <body>
-
 <h1>Master Sauce/Dressing/Marinade Picker</h1>
-
 <div class="filters">
   <select id="moodFilter">
-    <option value="All">All Moods</option>
+    <option value="All">All</option>
     <option value="Spicy">Spicy</option>
     <option value="Fresh">Fresh</option>
     <option value="Citrusy">Citrusy</option>
@@ -135,9 +133,8 @@
     <option value="Creamy">Creamy</option>
     <option value="Smoky">Smoky</option>
   </select>
-
   <select id="flavorFilter">
-    <option value="All">All Flavors</option>
+    <option value="All">All</option>
     <option value="Asian">Asian</option>
     <option value="Latin">Latin</option>
     <option value="Mediterranean">Mediterranean</option>
@@ -146,9 +143,8 @@
     <option value="Middle East">Middle East</option>
     <option value="Eastern Europe">Eastern Europe</option>
   </select>
-
   <select id="veggieFilter">
-    <option value="All">All Vegetables</option>
+    <option value="All">All</option>
     <option value="cucumbers">Cucumbers</option>
     <option value="potatoes">Potatoes</option>
     <option value="sweet potatoes">Sweet Potatoes</option>
@@ -160,18 +156,16 @@
     <option value="green beans">Green Beans</option>
   </select>
 </div>
-
 <div class="cards" id="cardContainer"></div>
-
 <script>
-const sauces = [ // Added by
+const sauces = [
   {name:"🇰🇷 Gochujang Spicy", main:"gochujang, soy, vinegar", optional:"garlic, honey, sesame oil", veggies:"cabbage, carrots, cucumbers", mood:"Spicy", flavor:"Asian"},
   {name:"🌶 Lime–Chili", main:"lime, chili, garlic", optional:"cilantro, onion", veggies:"cucumbers, carrots, tomatoes", mood:"Spicy / Citrusy", flavor:"Latin"},
   {name:"🇿🇦 Peri-Peri", main:"chili, lemon, garlic, oil", optional:"smoked paprika, vinegar", veggies:"potatoes, sweet potatoes, cabbage", mood:"Spicy / Smoky / Citrusy", flavor:"African"},
   {name:"🇺🇸 Sriracha-Mayo Light", main:"light mayo, sriracha, lemon", optional:"garlic", veggies:"potatoes, sweet potatoes, carrots", mood:"Spicy / Creamy", flavor:"USA"},
   {name:"🇮🇹 Olive Oil–Lemon Herb", main:"olive oil, lemon, garlic", optional:"oregano, parsley", veggies:"tomatoes, lettuce, cucumbers", mood:"Fresh / Citrusy", flavor:"Mediterranean"},
   {name:"🇬🇷 Garlic Herb", main:"olive oil, garlic, herbs", optional:"lemon, pepper", veggies:"tomatoes, lettuce, carrots", mood:"Fresh", flavor:"Mediterranean"},
-  {name:"🇮🇨 Mojo Verde", main:"cilantro, oil, vinegar", optional:"garlic, cumin", veggies:"potatoes, carrots", mood:"Fresh / Spicy", flavor:"Latin"},
+  {name:"🇯🇵 Mojo Verde", main:"cilantro, oil, vinegar", optional:"garlic, cumin", veggies:"potatoes, carrots", mood:"Fresh / Spicy", flavor:"Latin"},
   {name:"🇯🇵 Soy–Ginger", main:"soy sauce, ginger, garlic", optional:"sesame oil, honey", veggies:"cabbage, broccoli, green beans", mood:"Umami", flavor:"Asian"},
   {name:"🇯🇵 Miso–Umami", main:"miso, vinegar, soy", optional:"ginger, sesame", veggies:"cabbage, carrots, potatoes", mood:"Umami", flavor:"Asian"},
   {name:"🇯🇵 Sweet Soy / Teriyaki", main:"soy, sugar, vinegar", optional:"ginger, garlic", veggies:"carrots, broccoli, beans", mood:"Umami", flavor:"Asian"},
@@ -189,55 +183,164 @@ const sauces = [ // Added by
 ];
 const container = document.getElementById('cardContainer');
 
+// Derive distinct values for each filter, including 'All' as default
+const moodsSet = new Set(['All']);
+const flavorsSet = new Set(['All']);
+const veggiesSet = new Set(['All']);
+
+sauces.forEach(s => {
+  s.mood.split('/').forEach(m => moodsSet.add(m.trim()));
+  s.flavor.split('/').forEach(f => flavorsSet.add(f.trim()));
+  s.veggies.split(',').forEach(v => veggiesSet.add(v.trim()));
+});
+const distinctMoods = Array.from(moodsSet);
+const distinctFlavors = Array.from(flavorsSet);
+const distinctVeggies = Array.from(veggiesSet);
+
+// Helper: populate a <select> with given options and optionally set a selected value
+function populateSelect(selectEl, options, selectedValue = 'All') {
+  selectEl.innerHTML = '';
+  options.forEach(opt => {
+    const optionEl = document.createElement('option');
+    optionEl.value = opt;
+    optionEl.textContent = opt;
+    if (opt === selectedValue) {
+      optionEl.selected = true;
+    }
+    selectEl.appendChild(optionEl);
+  });
+}
+
+// Determine if a given combination of filter values yields any matching sauces
+function wouldHaveMatches(moodVal, flavorVal, veggieVal) {
+  return sauces.some(s => {
+    const cardMoods = s.mood.split('/').map(m => m.trim());
+    const cardFlavors = s.flavor.split('/').map(f => f.trim());
+    const cardVeggies = s.veggies.split(',').map(v => v.trim().toLowerCase());
+
+    const moodMatch = (moodVal === 'All') || cardMoods.includes(moodVal);
+    const flavorMatch = (flavorVal === 'All') || cardFlavors.includes(flavorVal);
+    const veggieMatch = (veggieVal === 'All') || cardVeggies.includes(veggieVal.toLowerCase());
+
+    return moodMatch && flavorMatch && veggieMatch;
+  });
+}
+
+// Hide/show options in a select that would not lead to any matches when selected
+function updateOptionVisibility(selectId) {
+  const select = document.getElementById(selectId);
+  const currentValue = select.value; // currently selected option
+
+  Array.from(select.options).forEach(option => {
+    // Always keep 'All' visible for resetting
+    if (option.value === 'All') {
+      option.style.display = '';
+      return;
+    }
+
+    // Keep the currently selected option visible
+    if (option.value === currentValue) {
+      option.style.display = '';
+      return;
+    }
+
+    // Simulate selecting this option while preserving other filter values
+    const simulatedValue = option.value;
+    const tempFilters = {
+      moodFilter: selectId === 'moodFilter' ? simulatedValue : document.getElementById('moodFilter').value,
+      flavorFilter: selectId === 'flavorFilter' ? simulatedValue : document.getElementById('flavorFilter').value,
+      veggieFilter: selectId === 'veggieFilter' ? simulatedValue : document.getElementById('veggieFilter').value,
+    };
+
+    const wouldMatch = wouldHaveMatches(
+      tempFilters.moodFilter,
+      tempFilters.flavorFilter,
+      tempFilters.veggieFilter
+    );
+
+    // Hide option if it would yield no matches
+    option.style.display = wouldMatch ? '' : 'none';
+  });
+}
+
+// Render all cards into the container
 function renderCards() {
-  container.innerHTML = '';
+  container.innerHTML = ''; // Clear existing
   sauces.forEach(sauce => {
     const card = document.createElement('div');
-    card.classList.add('card');
-    // Add data attributes for filtering
-    card.dataset.mood = sauce.mood; // keep full string
+    card.className = 'card';
+    card.dataset.mood = sauce.mood;
     card.dataset.flavor = sauce.flavor;
     card.dataset.veggies = sauce.veggies;
+
+    const moodBrackets = sauce.mood.split('/').map(m => `mood__color-${m.trim()}`).join(' ');
+    const flavorBrackets = sauce.flavor.split('/').map(f => `flavor__color-${f.trim().replace(/ /g,'')}`).join(' ');
 
     card.innerHTML = `
       <h3>${sauce.name}</h3>
       <p><strong>Main:</strong> ${sauce.main}</p>
       <p><strong>Optional:</strong> ${sauce.optional}</p>
-      <p><strong>Best Veggies:</strong> ${sauce.veggies}</p>
+      <p><strong>Veggies:</strong> ${sauce.veggies}</p>
       <div>
-        ${sauce.mood.split('/').map(m => `<span class="badge mood__color-${m.trim()}">${m.trim()}</span>`).join(' ')}
-        ${sauce.flavor.split('/').map(f => `<span class="badge flavor__color-${f.trim().replace(/\s/g,'')}">${f.trim()}</span>`).join(' ')}
+        <span class="badge ${moodBrackets}">${sauce.mood}</span>
+        <span class="badge ${flavorBrackets}">${sauce.flavor}</span>
       </div>
     `;
     container.appendChild(card);
   });
 }
 
+// Filter cards according to current selections and update option visibility
 function filterCards() {
-  const moodValue = document.getElementById('moodFilter').value;
-  const flavorValue = document.getElementById('flavorFilter').value;
-  const veggieValue = document.getElementById('veggieFilter').value;
+  renderCards(); // Ensure cards exist before filtering
+
+  const mood = document.getElementById('moodFilter').value;
+  const flavor = document.getElementById('flavorFilter').value;
+  const veggie = document.getElementById('veggieFilter').value;
+
   const cards = container.querySelectorAll('.card');
 
+  let anyVisible = false;
   cards.forEach(card => {
-    const moods = card.dataset.mood.split('/').map(m => m.trim());
-    const flavors = card.dataset.flavor.split('/').map(f => f.trim());
-    const veggies = card.dataset.veggies.split(',').map(v => v.trim().toLowerCase());
+    const cardMoods = card.dataset.mood.split('/').map(m => m.trim());
+    const cardFlavors = card.dataset.flavor.split('/').map(f => f.trim());
+    const cardVeggies = card.dataset.veggies.split(',').map(v => v.trim().toLowerCase());
 
-    const moodMatch = (moodValue === 'All') || moods.includes(moodValue);
-    const flavorMatch = (flavorValue === 'All') || flavors.includes(flavorValue);
-    const veggieMatch = (veggieValue === 'All') || veggies.includes(veggieValue);
+    const moodMatch = (mood === 'All') || cardMoods.includes(mood);
+    const flavorMatch = (flavor === 'All') || cardFlavors.includes(flavor);
+    const veggieMatch = (veggie === 'All') || cardVeggies.includes(veggie.toLowerCase());
 
     card.style.display = (moodMatch && flavorMatch && veggieMatch) ? 'flex' : 'none';
+    if (moodMatch && flavorMatch && veggieMatch) anyVisible = true;
   });
+
+  // After filtering, adjust visibility of each filter's options
+  ['moodFilter', 'flavorFilter', 'veggieFilter'].forEach(id => updateOptionVisibility(id));
+
+  return anyVisible;
 }
 
-document.getElementById('moodFilter').addEventListener('change', filterCards);
-document.getElementById('flavorFilter').addEventListener('change', filterCards);
-document.getElementById('veggieFilter').addEventListener('change', filterCards);
+// Initialize the UI: populate selects and attach listeners
+function initUI() {
+  const moodSelect = document.getElementById('moodFilter');
+  const flavorSelect = document.getElementById('flavorFilter');
+  const veggieSelect = document.getElementById('veggieFilter');
 
-renderCards();
+  populateSelect(moodSelect, distinctMoods, 'All');
+  populateSelect(flavorSelect, distinctFlavors, 'All');
+  populateSelect(veggieSelect, distinctVeggies, 'All');
+
+  // Attach change listeners
+  moodSelect.addEventListener('change', filterCards);
+  flavorSelect.addEventListener('change', filterCards);
+  veggieSelect.addEventListener('change', filterCards);
+
+  // Initial render
+  filterCards();
+}
+
+// Run initialization
+initUI();
 </script>
-
 </body>
 </html>
