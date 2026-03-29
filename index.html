@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Master Sauce/Dressing/Marinade Picker</title>
+<title>Master Sauce & Marinade Picker</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>🥫</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
@@ -12,335 +12,350 @@
     margin: 0;
     padding: 20px;
     font-family: 'Montserrat', sans-serif;
-    background: #121212;
+    background: #000;
     color: #eee;
   }
 
-  h1 {
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-    color: #fff;
-  }
+  h1 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; color: #fff; font-weight: 600; }
 
   .filters {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 40px;
   }
 
   select {
-    padding: 10px 15px;
-    font-size: 16px;
+    padding: 12px 18px;
+    font-size: 14px;
     border-radius: 12px;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.05);
     color: #fff;
-    backdrop-filter: blur(6px);
     cursor: pointer;
-    min-width: 140px;
-    transition: background 0.3s;
+    min-width: 185px;
+    outline: none;
   }
-
-  select:hover {
-    background: rgba(255,255,255,0.2);
-  }
+  select:hover { border-color: #555; }
+  select option { background: #111; color: #fff; }
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 25px;
+    max-width: 1500px;
+    margin: 0 auto;
   }
 
   .card {
     background: #000;
     border-radius: 20px;
-    padding: 15px 20px;
-    border: 1px solid #555;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 25px;
+    border: 1px solid #222;
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s, border-color 0.2s;
   }
+  .card:hover { border-color: #444; transform: translateY(-3px); }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-  }
+  .card h3 { margin: 0 0 15px; font-size: 19px; color: #fff; font-weight: 600; border-bottom: 1px solid #222; padding-bottom: 10px; }
+  .card p { margin: 8px 0; font-size: 13px; line-height: 1.6; color: #aaa; }
+  .card p strong { color: #fff; font-weight: 600; margin-right: 6px; }
+  
+  .badge-container { margin-top: auto; padding-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge { padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; color: #fff; text-transform: uppercase; }
 
-  .card h3 {
-    margin: 0 0 10px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-  }
+  /* UI Colors */
+  .bg-Spicy { background: #ff4c4c; }
+  .bg-Fresh { background: #1ed760; }
+  .bg-Citrusy { background: #ffb84c; }
+  .bg-Umami { background: #4c9cff; }
+  .bg-Creamy { background: #d84cff; }
+  .bg-Smoky { background: #777; }
+  .bg-Nutty { background: #8e44ad; }
+  .bg-Bold { background: #e74c3c; }
 
-  .card p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #ccc;
-  }
+  .bg-Asian { background: #ff6e40; }
+  .bg-Latin { background: #ffcc29; color: #000; }
+  .bg-Mediterranean { background: #2ed3c2; color: #000; }
+  .bg-African { background: #e67e22; }
+  .bg-USA { background: #ff5e78; }
+  .bg-MiddleEast { background: #9b59b6; }
+  .bg-EasternEurope { background: #95a5a6; }
 
-  .badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 8px;
-    font-size: 12px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    color: #fff;
-    font-weight: 500;
-  }
-
-  .mood__color-Spicy { background: #ff4c4c; }
-  .mood__color-Fresh { background: #1ed760; }
-  .mood__color-Citrusy { background: #ffb84c; }
-  .mood__color-Umami { background: #4c9cff; }
-  .mood__color-Creamy { background: #d84cff; }
-  .mood__color-Smoky { background: #777; }
-
-  .flavor__color-Asian { background: #ff6e40; }
-  .flavor__color-Latin { background: #ffcc29; color:#000; }
-  .flavor__color-Mediterranean { background: #2ed3c2; color:#000; }
-  .flavor__color-African { background: #ff7f50; }
-  .flavor__color-USA { background: #ff5e78; }
-  .flavor__color-MiddleEast { background: #9b59b6; }
-  .flavor__color-EasternEurope { background: #95a5a6; }
-
-  @media (max-width: 500px) {
-    .filters {
-      flex-direction: column;
-      align-items: center;
-    }
-    select {
-      width: 90%;
-    }
-  }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
-<h1>Master Sauce/Dressing/Marinade Picker</h1>
+
+<h1>Master Sauce Picker</h1>
+
 <div class="filters">
-  <select id="moodFilter">
-    <option value="All">All</option>
-    <option value="Spicy">Spicy</option>
-    <option value="Fresh">Fresh</option>
-    <option value="Citrusy">Citrusy</option>
-    <option value="Umami">Umami</option>
-    <option value="Creamy">Creamy</option>
-    <option value="Smoky">Smoky</option>
-  </select>
-  <select id="flavorFilter">
-    <option value="All">All</option>
-    <option value="Asian">Asian</option>
-    <option value="Latin">Latin</option>
-    <option value="Mediterranean">Mediterranean</option>
-    <option value="African">African</option>
-    <option value="USA">USA</option>
-    <option value="Middle East">Middle East</option>
-    <option value="Eastern Europe">Eastern Europe</option>
-  </select>
-  <select id="veggieFilter">
-    <option value="All">All</option>
-    <option value="cucumbers">Cucumbers</option>
-    <option value="potatoes">Potatoes</option>
-    <option value="sweet potatoes">Sweet Potatoes</option>
-    <option value="carrots">Carrots</option>
-    <option value="tomatoes">Tomatoes</option>
-    <option value="lettuce">Lettuce</option>
-    <option value="cabbage">Cabbage</option>
-    <option value="celery">Celery</option>
-    <option value="green beans">Green Beans</option>
-  </select>
+  <select id="moodFilter"><option value="All">All Moods</option></select>
+  <select id="flavorFilter"><option value="All">All Flavours</option></select>
+  <select id="proteinFilter"><option value="All">All Proteins</option></select>
+  <select id="veggieFilter"><option value="All">All Vegetables</option></select>
 </div>
-<div class="cards" id="cardContainer"></div>
+
+<div id="cardContainer" class="cards"></div>
+
 <script>
 const sauces = [
-  {name:"🇰🇷 Gochujang Spicy", main:"gochujang, soy, vinegar", optional:"garlic, honey, sesame oil", veggies:"cabbage, carrots, cucumbers", mood:"Spicy", flavor:"Asian"},
-  {name:"🌶 Lime–Chili", main:"lime, chili, garlic", optional:"cilantro, onion", veggies:"cucumbers, carrots, tomatoes", mood:"Spicy / Citrusy", flavor:"Latin"},
-  {name:"🇿🇦 Peri-Peri", main:"chili, lemon, garlic, oil", optional:"smoked paprika, vinegar", veggies:"potatoes, sweet potatoes, cabbage", mood:"Spicy / Smoky / Citrusy", flavor:"African"},
-  {name:"🇺🇸 Sriracha-Mayo Light", main:"light mayo, sriracha, lemon", optional:"garlic", veggies:"potatoes, sweet potatoes, carrots", mood:"Spicy / Creamy", flavor:"USA"},
-  {name:"🇮🇹 Olive Oil–Lemon Herb", main:"olive oil, lemon, garlic", optional:"oregano, parsley", veggies:"tomatoes, lettuce, cucumbers", mood:"Fresh / Citrusy", flavor:"Mediterranean"},
-  {name:"🇬🇷 Garlic Herb", main:"olive oil, garlic, herbs", optional:"lemon, pepper", veggies:"tomatoes, lettuce, carrots", mood:"Fresh", flavor:"Mediterranean"},
-  {name:"🇯🇵 Mojo Verde", main:"cilantro, oil, vinegar", optional:"garlic, cumin", veggies:"potatoes, carrots", mood:"Fresh / Spicy", flavor:"Latin"},
-  {name:"🇯🇵 Soy–Ginger", main:"soy sauce, ginger, garlic", optional:"sesame oil, honey", veggies:"cabbage, broccoli, green beans", mood:"Umami", flavor:"Asian"},
-  {name:"🇯🇵 Miso–Umami", main:"miso, vinegar, soy", optional:"ginger, sesame", veggies:"cabbage, carrots, potatoes", mood:"Umami", flavor:"Asian"},
-  {name:"🇯🇵 Sweet Soy / Teriyaki", main:"soy, sugar, vinegar", optional:"ginger, garlic", veggies:"carrots, broccoli, beans", mood:"Umami", flavor:"Asian"},
-  {name:"🇯🇵 Miso–Tahini", main:"miso, tahini, lemon", optional:"garlic, ginger", veggies:"carrots, cabbage, potatoes", mood:"Creamy / Umami", flavor:"Asian / Middle East"},
-  {name:"🕌 Tahini–Garlic", main:"tahini, lemon, garlic", optional:"cumin, parsley", veggies:"carrots, cabbage, cucumbers", mood:"Creamy / Garlicky", flavor:"Middle East"},
-  {name:"🇬🇷 Tzatziki-Style", main:"yogurt, cucumber, garlic", optional:"dill, mint", veggies:"cucumbers, carrots, potatoes", mood:"Creamy / Fresh", flavor:"Mediterranean"},
-  {name:"🇺🇸 BBQ Style", main:"tomato paste, vinegar, sugar", optional:"paprika, mustard", veggies:"potatoes, cabbage", mood:"Smoky", flavor:"USA"},
-  {name:"🇭🇺 Paprika–Garlic", main:"paprika, garlic, oil", optional:"vinegar, lemon", veggies:"potatoes, cabbage, carrots", mood:"Smoky / Garlicky", flavor:"Eastern Europe"},
-  {name:"🇧🇷 Brazilian Chimichurri", main:"parsley oil, garlic, red wine vinegar, cumin", optional:"mint, oregano", veggies:"arugula, bell peppers, red onions", mood:"Bold / Herby", flavor:"Latin"},
-  {name:"🇹🇭 Thai Satay Peanut Sauce", main:"roasted peanuts, tamarind paste, soy sauce", optional:"sesame seeds, chili flakes", veggies:"green beans, carrots, jicama", mood:"Nutty / Savory", flavor:"Southeast Asian"},
-  {name:"🇪🇬 Egyptian Harissa", main:"smoked chili, garlic, cumin, coriander", optional:"lemon juice, olive oil", veggies:"eggplant, zucchini, tomatoes", mood:"Smoky / Spicy", flavor:"North African"},
-  {name:"🇫🇷 French Béarnaise", main:"butter, egg yolks, tarragon, white wine vinegar", optional:"shallots, chives", veggies:"asparagus, artichokes, steak", mood:"Rich / Creamy", flavor:"Classical"},
-  {name:"🇲🇽 Mexican Adobo", main:"oregano, garlic, cumin, citrus zest", optional:"clove, cinnamon", veggies:"beans, squash, chicken", mood:"Earthy / Aromatic", flavor:"Traditional"},
-  {name:"🇮🇹 Italian Aglio e Olio", main:"garlic, olive oil, chili flakes, parsley", optional:"lemon zest, capers", veggies:"spaghetti, broccoli, cherry tomatoes", mood:"Simple / Fresh", flavor:"Mediterranean"}
+  {
+    name: "🇰🇷 Classic Gochujang",
+    recipe: "3 tbsp Gochujang, 2 tbsp Soy sauce, 1 tbsp Rice vinegar, 1 tbsp Honey, 1 tsp Sesame oil",
+    optional: "Minced garlic, Scallions",
+    proteins: ["Poultry", "Red Meat", "Tofu"],
+    veggies: ["Cruciferous", "Root Vegetables"],
+    mood: ["Spicy", "Umami"],
+    flavor: ["Asian"]
+  },
+  {
+    name: "🇦🇷 Chimichurri Rojo",
+    recipe: "1/2 cup Parsley, 1/3 cup Olive oil, 2 tbsp Red wine vinegar, 1 tbsp Smoked paprika, 3 cloves Garlic",
+    optional: "Dried oregano, Red pepper flakes",
+    proteins: ["Red Meat", "Seafood"],
+    veggies: ["Nightshades", "Root Vegetables"],
+    mood: ["Fresh", "Bold"],
+    flavor: ["Latin"]
+  },
+  {
+    name: "🇱🇧 Creamy Tahini-Lemon",
+    recipe: "1/2 cup Tahini, 1/4 cup Warm water, 3 tbsp Lemon juice, 2 cloves Garlic, 1/2 tsp Salt",
+    optional: "Ground cumin, Fresh parsley",
+    proteins: ["Legumes", "Poultry", "Red Meat"],
+    veggies: ["Nightshades", "Root Vegetables"],
+    mood: ["Creamy"],
+    flavor: ["Middle East"]
+  },
+  {
+    name: "🇯🇵 Miso-Ginger Glaze",
+    recipe: "3 tbsp White miso, 2 tbsp Mirin, 1 tbsp Soy sauce, 1 tbsp Grated ginger, 1 tsp Brown sugar",
+    optional: "Rice vinegar, Scallions",
+    proteins: ["Seafood", "Tofu", "Poultry"],
+    veggies: ["Nightshades", "Cruciferous"],
+    mood: ["Umami", "Fresh"],
+    flavor: ["Asian"]
+  },
+  {
+    name: "🇬🇷 Authentic Tzatziki",
+    recipe: "1 cup Greek yogurt, 1/2 grated Cucumber, 2 tbsp Lemon juice, 1 tbsp Olive oil, 2 cloves Garlic",
+    optional: "Fresh dill, Mint",
+    proteins: ["Red Meat", "Poultry"],
+    veggies: ["Root Vegetables", "Nightshades"],
+    mood: ["Creamy", "Fresh"],
+    flavor: ["Mediterranean"]
+  },
+  {
+    name: "🇹🇭 Peanut Satay",
+    recipe: "1/2 cup Peanut butter, 1/4 cup Coconut milk, 2 tbsp Soy sauce, 1 tbsp Lime juice, 1 tsp Red curry paste",
+    optional: "Brown sugar, Ginger",
+    proteins: ["Poultry", "Tofu", "Red Meat"],
+    veggies: ["Root Vegetables", "Cruciferous"],
+    mood: ["Nutty", "Creamy"],
+    flavor: ["Asian"]
+  },
+  {
+    name: "🇲🇦 Zesty Chermoula",
+    recipe: "1/2 cup Cilantro, 1/2 cup Parsley, 1/3 cup Olive oil, 2 tbsp Lemon juice, 2 tsp Cumin",
+    optional: "Paprika, Chili flakes",
+    proteins: ["Seafood", "Poultry", "Legumes"],
+    veggies: ["Nightshades", "Root Vegetables"],
+    mood: ["Fresh", "Citrusy"],
+    flavor: ["African"]
+  },
+  {
+    name: "🇲🇽 Chipotle Adobo",
+    recipe: "3 Chipotles in adobo, 1/4 cup Olive oil, 2 tbsp Lime juice, 1 tsp Cumin, 1 tsp Garlic powder",
+    optional: "Honey, Dried oregano",
+    proteins: ["Red Meat", "Poultry"],
+    veggies: ["Root Vegetables", "Nightshades"],
+    mood: ["Smoky", "Spicy"],
+    flavor: ["Latin"]
+  },
+  {
+    name: "🇻🇳 Classic Nuoc Cham",
+    recipe: "1/4 cup Water, 2 tbsp Lime juice, 2 tbsp Sugar, 1.5 tbsp Fish sauce, 1 clove Garlic",
+    optional: "Bird's eye chili, Shredded carrots",
+    proteins: ["Red Meat", "Seafood", "Poultry"],
+    veggies: ["Leafy Greens", "Root Vegetables"],
+    mood: ["Umami", "Citrusy"],
+    flavor: ["Asian"]
+  },
+  {
+    name: "🇿🇦 African Peri-Peri",
+    recipe: "1/2 cup Olive oil, 1/4 cup Lemon juice, 4 Birds eye chilies, 3 cloves Garlic, 2 tsp Smoked paprika",
+    optional: "Dried oregano, Onion powder",
+    proteins: ["Poultry", "Seafood"],
+    veggies: ["Root Vegetables", "Cruciferous"],
+    mood: ["Spicy", "Citrusy"],
+    flavor: ["African"]
+  },
+  {
+    name: "🇺🇸 Classic BBQ",
+    recipe: "1 cup Ketchup, 1/4 cup Apple cider vinegar, 2 tbsp Brown sugar, 1 tbsp Mustard, 1 tsp Smoked paprika",
+    optional: "Worcestershire sauce, Garlic powder",
+    proteins: ["Red Meat", "Poultry"],
+    veggies: ["Root Vegetables", "Cruciferous"],
+    mood: ["Smoky", "Bold"],
+    flavor: ["USA"]
+  },
+  {
+    name: "🇮🇹 Italian Salsa Verde",
+    recipe: "1 cup Flat parsley, 1/2 cup Olive oil, 2 tbsp Capers, 1 tbsp Lemon juice, 2 cloves Garlic",
+    optional: "Anchovies, Red pepper flakes",
+    proteins: ["Seafood", "Red Meat", "Poultry"],
+    veggies: ["Nightshades", "Cruciferous"],
+    mood: ["Fresh", "Bold"],
+    flavor: ["Mediterranean"]
+  },
+  {
+    name: "🇪🇸 Romesco Sauce",
+    recipe: "2 Roasted red peppers, 1/2 cup Toasted almonds, 1/4 cup Olive oil, 1 tbsp Sherry vinegar, 1 clove Garlic",
+    optional: "Smoked paprika, Tomato paste",
+    proteins: ["Seafood", "Poultry"],
+    veggies: ["Cruciferous", "Nightshades"],
+    mood: ["Nutty", "Smoky"],
+    flavor: ["Mediterranean"]
+  },
+  {
+    name: "🇯🇵 Teriyaki Glaze",
+    recipe: "1/2 cup Soy sauce, 1/4 cup Water, 3 tbsp Brown sugar, 1 tbsp Mirin, 1 tsp Grated ginger",
+    optional: "Cornstarch (for thickening), Garlic",
+    proteins: ["Poultry", "Seafood", "Tofu"],
+    veggies: ["Cruciferous", "Root Vegetables"],
+    mood: ["Umami", "Bold"],
+    flavor: ["Asian"]
+  },
+  {
+    name: "🇵🇪 Aji Amarillo Sauce",
+    recipe: "1/2 cup Aji Amarillo paste, 1/2 cup Mayonnaise, 1 tbsp Lime juice, 1 clove Garlic, 1 tsp Salt",
+    optional: "Cilantro, Huacatay herb",
+    proteins: ["Poultry", "Seafood", "Red Meat"],
+    veggies: ["Root Vegetables", "Nightshades"],
+    mood: ["Creamy", "Spicy"],
+    flavor: ["Latin"]
+  },
+  {
+    name: "🇭🇺 Paprika-Garlic Oil",
+    recipe: "1/2 cup Sunflower oil, 2 tbsp Sweet Hungarian paprika, 4 cloves Garlic (minced), 1 tsp Salt",
+    optional: "Hot paprika, Lemon zest",
+    proteins: ["Red Meat", "Poultry"],
+    veggies: ["Root Vegetables", "Cruciferous"],
+    mood: ["Smoky", "Bold"],
+    flavor: ["Eastern Europe"]
+  },
+  {
+    name: "🇫🇷 Classic Peppercorn",
+    recipe: "1/2 cup Heavy cream, 1/4 cup Beef stock, 2 tbsp Crushed black peppercorns, 1 tbsp Butter, 1 tsp Brandy",
+    optional: "Shallots, Dijon mustard",
+    proteins: ["Red Meat"],
+    veggies: ["Root Vegetables", "Nightshades"],
+    mood: ["Creamy", "Bold"],
+    flavor: ["Mediterranean"]
+  },
+  {
+    name: "🇬🇪 Bazhe Walnut Sauce",
+    recipe: "1 cup Walnuts, 1/2 cup Warm water, 2 cloves Garlic, 1 tsp Coriander, 1 tsp Turmeric",
+    optional: "Red wine vinegar, Chili flakes",
+    proteins: ["Poultry", "Tofu"],
+    veggies: ["Cruciferous", "Nightshades"],
+    mood: ["Nutty", "Creamy"],
+    flavor: ["Eastern Europe"]
+  }
 ];
-const container = document.getElementById('cardContainer');
 
-// Derive distinct values for each filter, including 'All' as default
-const moodsSet = new Set(['All']);
-const flavorsSet = new Set(['All']);
-const veggiesSet = new Set(['All']);
+const filterEls = {
+  mood: document.getElementById('moodFilter'),
+  flavor: document.getElementById('flavorFilter'),
+  protein: document.getElementById('proteinFilter'),
+  veggie: document.getElementById('veggieFilter')
+};
 
-sauces.forEach(s => {
-  s.mood.split('/').forEach(m => moodsSet.add(m.trim()));
-  s.flavor.split('/').forEach(f => flavorsSet.add(f.trim()));
-  s.veggies.split(',').forEach(v => veggiesSet.add(v.trim()));
-});
-const distinctMoods = Array.from(moodsSet);
-const distinctFlavors = Array.from(flavorsSet);
-const distinctVeggies = Array.from(veggiesSet);
+function init() {
+  const container = document.getElementById('cardContainer');
+  const sets = { mood: new Set(), flavor: new Set(), protein: new Set(), veggie: new Set() };
 
-// Helper: populate a <select> with given options and optionally set a selected value
-function populateSelect(selectEl, options, selectedValue = 'All') {
-  selectEl.innerHTML = '';
-  options.forEach(opt => {
-    const optionEl = document.createElement('option');
-    optionEl.value = opt;
-    optionEl.textContent = opt;
-    if (opt === selectedValue) {
-      optionEl.selected = true;
-    }
-    selectEl.appendChild(optionEl);
-  });
-}
+  sauces.forEach(s => {
+    s.mood.forEach(m => sets.mood.add(m));
+    s.flavor.forEach(f => sets.flavor.add(f));
+    s.proteins.forEach(p => sets.protein.add(p));
+    s.veggies.forEach(v => sets.veggie.add(v));
 
-// Determine if a given combination of filter values yields any matching sauces
-function wouldHaveMatches(moodVal, flavorVal, veggieVal) {
-  return sauces.some(s => {
-    const cardMoods = s.mood.split('/').map(m => m.trim());
-    const cardFlavors = s.flavor.split('/').map(f => f.trim());
-    const cardVeggies = s.veggies.split(',').map(v => v.trim().toLowerCase());
-
-    const moodMatch = (moodVal === 'All') || cardMoods.includes(moodVal);
-    const flavorMatch = (flavorVal === 'All') || cardFlavors.includes(flavorVal);
-    const veggieMatch = (veggieVal === 'All') || cardVeggies.includes(veggieVal.toLowerCase());
-
-    return moodMatch && flavorMatch && veggieMatch;
-  });
-}
-
-// Hide/show options in a select that would not lead to any matches when selected
-function updateOptionVisibility(selectId) {
-  const select = document.getElementById(selectId);
-  const currentValue = select.value; // currently selected option
-
-  Array.from(select.options).forEach(option => {
-    // Always keep 'All' visible for resetting
-    if (option.value === 'All') {
-      option.style.display = '';
-      return;
-    }
-
-    // Keep the currently selected option visible
-    if (option.value === currentValue) {
-      option.style.display = '';
-      return;
-    }
-
-    // Simulate selecting this option while preserving other filter values
-    const simulatedValue = option.value;
-    const tempFilters = {
-      moodFilter: selectId === 'moodFilter' ? simulatedValue : document.getElementById('moodFilter').value,
-      flavorFilter: selectId === 'flavorFilter' ? simulatedValue : document.getElementById('flavorFilter').value,
-      veggieFilter: selectId === 'veggieFilter' ? simulatedValue : document.getElementById('veggieFilter').value,
-    };
-
-    const wouldMatch = wouldHaveMatches(
-      tempFilters.moodFilter,
-      tempFilters.flavorFilter,
-      tempFilters.veggieFilter
-    );
-
-    // Hide option if it would yield no matches
-    option.style.display = wouldMatch ? '' : 'none';
-  });
-}
-
-// Render all cards into the container
-function renderCards() {
-  container.innerHTML = ''; // Clear existing
-  sauces.forEach(sauce => {
     const card = document.createElement('div');
     card.className = 'card';
-    card.dataset.mood = sauce.mood;
-    card.dataset.flavor = sauce.flavor;
-    card.dataset.veggies = sauce.veggies;
-
-    const moodBrackets = sauce.mood.split('/').map(m => `mood__color-${m.trim()}`).join(' ');
-    const flavorBrackets = sauce.flavor.split('/').map(f => `flavor__color-${f.trim().replace(/ /g,'')}`).join(' ');
-
+    card.dataset.info = JSON.stringify({mood: s.mood, flavor: s.flavor, protein: s.proteins, veggie: s.veggies});
     card.innerHTML = `
-      <h3>${sauce.name}</h3>
-      <p><strong>Main:</strong> ${sauce.main}</p>
-      <p><strong>Optional:</strong> ${sauce.optional}</p>
-      <p><strong>Veggies:</strong> ${sauce.veggies}</p>
-      <div>
-        <span class="badge ${moodBrackets}">${sauce.mood}</span>
-        <span class="badge ${flavorBrackets}">${sauce.flavor}</span>
+      <h3>${s.name}</h3>
+      <p><strong>Recipe:</strong> ${s.recipe}</p>
+      <p><strong>Optional:</strong> ${s.optional}</p>
+      <p><strong>Pairs With:</strong> ${s.proteins.join(', ')} & ${s.veggies.join(', ')}</p>
+      <div class="badge-container">
+        ${s.mood.map(m => `<span class="badge bg-${m}">${m}</span>`).join('')}
+        ${s.flavor.map(f => `<span class="badge bg-${f.replace(/\s/g, '')}">${f}</span>`).join('')}
       </div>
     `;
     container.appendChild(card);
   });
+
+  Object.keys(sets).forEach(key => populate(filterEls[key], sets[key]));
+  Object.values(filterEls).forEach(el => el.addEventListener('change', update));
 }
 
-// Filter cards according to current selections and update option visibility
-function filterCards() {
-  renderCards(); // Ensure cards exist before filtering
+function populate(select, data) {
+  Array.from(data).sort().forEach(val => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val;
+    select.appendChild(opt);
+  });
+}
 
-  const mood = document.getElementById('moodFilter').value;
-  const flavor = document.getElementById('flavorFilter').value;
-  const veggie = document.getElementById('veggieFilter').value;
+function update() {
+  const current = {
+    mood: filterEls.mood.value,
+    flavor: filterEls.flavor.value,
+    protein: filterEls.protein.value,
+    veggie: filterEls.veggie.value
+  };
 
-  const cards = container.querySelectorAll('.card');
-
-  let anyVisible = false;
-  cards.forEach(card => {
-    const cardMoods = card.dataset.mood.split('/').map(m => m.trim());
-    const cardFlavors = card.dataset.flavor.split('/').map(f => f.trim());
-    const cardVeggies = card.dataset.veggies.split(',').map(v => v.trim().toLowerCase());
-
-    const moodMatch = (mood === 'All') || cardMoods.includes(mood);
-    const flavorMatch = (flavor === 'All') || cardFlavors.includes(flavor);
-    const veggieMatch = (veggie === 'All') || cardVeggies.includes(veggie.toLowerCase());
-
-    card.style.display = (moodMatch && flavorMatch && veggieMatch) ? 'flex' : 'none';
-    if (moodMatch && flavorMatch && veggieMatch) anyVisible = true;
+  document.querySelectorAll('.card').forEach(card => {
+    const data = JSON.parse(card.dataset.info);
+    const match = (current.mood === 'All' || data.mood.includes(current.mood)) &&
+                  (current.flavor === 'All' || data.flavor.includes(current.flavor)) &&
+                  (current.protein === 'All' || data.protein.includes(current.protein)) &&
+                  (current.veggie === 'All' || data.veggie.includes(current.veggie));
+    card.classList.toggle('hidden', !match);
   });
 
-  // After filtering, adjust visibility of each filter's options
-  ['moodFilter', 'flavorFilter', 'veggieFilter'].forEach(id => updateOptionVisibility(id));
+  // Smart Filter Logic
+  Object.keys(filterEls).forEach(key => {
+    const select = filterEls[key];
+    const otherFilters = Object.keys(filterEls).filter(k => k !== key);
+    
+    const validValues = new Set();
+    sauces.forEach(s => {
+      const matchOthers = otherFilters.every(k => {
+        const checkKey = k === 'veggie' ? 'veggies' : (k === 'protein' ? 'proteins' : k);
+        return current[k] === 'All' || s[checkKey].includes(current[k]);
+      });
+      if (matchOthers) {
+        const dataKey = key === 'veggie' ? 'veggies' : (key === 'protein' ? 'proteins' : key);
+        s[dataKey].forEach(v => validValues.add(v));
+      }
+    });
 
-  return anyVisible;
+    Array.from(select.options).forEach(opt => {
+      if (opt.value === 'All') return;
+      const ok = validValues.has(opt.value);
+      opt.style.display = ok ? 'block' : 'none';
+      opt.disabled = !ok;
+    });
+  });
 }
 
-// Initialize the UI: populate selects and attach listeners
-function initUI() {
-  const moodSelect = document.getElementById('moodFilter');
-  const flavorSelect = document.getElementById('flavorFilter');
-  const veggieSelect = document.getElementById('veggieFilter');
-
-  populateSelect(moodSelect, distinctMoods, 'All');
-  populateSelect(flavorSelect, distinctFlavors, 'All');
-  populateSelect(veggieSelect, distinctVeggies, 'All');
-
-  // Attach change listeners
-  moodSelect.addEventListener('change', filterCards);
-  flavorSelect.addEventListener('change', filterCards);
-  veggieSelect.addEventListener('change', filterCards);
-
-  // Initial render
-  filterCards();
-}
-
-// Run initialization
-initUI();
+init();
 </script>
 </body>
 </html>
